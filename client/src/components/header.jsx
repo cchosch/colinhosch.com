@@ -2,7 +2,9 @@ import "./header.css"
 
 function Header(){
     return (<div className="header">
-        <div className="navLinks"><h>yo</h></div>
+        <div className="navBar">
+            <a href="/" className="navLink">yo</a>
+        </div>
     </div>);
 }
 
