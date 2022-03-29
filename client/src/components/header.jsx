@@ -1,10 +1,9 @@
-import "./header.css"
+import "./header.css";
+import NavBar from "./navbar.jsx";
 
 function Header(){
     return (<div className="header">
-        <div className="navBar">
-            <a href="/" className="navLink">yo</a>
-        </div>
+        <NavBar/>
     </div>);
 }
 

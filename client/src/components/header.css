@@ -1,19 +1,30 @@
 .header {
     width: 100%;
-    height: 100px;
+    padding-top: 3vh; 
+    padding-bottom: 50vh; 
     font-size: 100;
     background-color: #e89589;
 }
 
 .navBar{
     width: 100%;
-    padding-left: 3%;
-    padding-top: 1.5%;
+    display: flex;
+}
+
+.headName{
+    color: #ffffff;
+    font-size: 300%;
+    margin-top: 0;
 }
 
 .navLink{
     text-decoration: none;
-    color: #fff;
-    font-size: 2rem;
+    color: #ffffff;
+    font-size: 200%;
+    padding-right: 5%;
 }
 
+.navSection{
+    width: 33.3%;
+    text-align: center;
+}
