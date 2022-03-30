@@ -1,30 +1,59 @@
 .header {
     width: 100%;
-    padding-top: 3vh; 
-    padding-bottom: 50vh; 
+    height: 130vh;
     font-size: 100;
     background-color: #e89589;
 }
 
 .navBar{
+    padding-top: 2vh;
     width: 100%;
     display: flex;
+    height: auto;
+}
+
+.info{
+    border-style: dotted;
+    border-color: #ebada4;
+    display: grid;
+    grid-template-columns: 50% 50%;
+    margin-left: 10%;
+    margin-top: 5%;
+    margin-right: 10%;
+}
+
+.infoCell{
+    font-size: 230%;
+}
+.leftInfo{
+    text-align: center;
 }
 
 .headName{
-    color: #ffffff;
+    color: white;
+    text-decoration: none;
     font-size: 300%;
-    margin-top: 0;
+    margin: 0;
 }
 
 .navLink{
     text-decoration: none;
-    color: #ffffff;
     font-size: 200%;
-    padding-right: 5%;
+    color: #ffffff;
+    padding-left: 5%;
 }
 
 .navSection{
     width: 33.3%;
     text-align: center;
+}
+
+.missionStatement{
+    padding-top: 20vh;
+    text-align: center;
+    font-size: 400%;
+}
+
+.left{
+    text-align: left;
 }
