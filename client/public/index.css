@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope&family=Montserrat:wght@400;500&display=swap');
+
+@font-face {
+    font-family: "lin libertine";
+    font-style: normal;
+    src: url("./fonts/lin-libertine/LinLibertine.ttf");
+}
+@font-face{
+    font-family: "lin libertine";
+    font-style: italic;
+    src: url("./fonts/lin-libertine/LinLibertine_italic.ttf")
+}
+
+body{
+    margin: 0;
+    background-color: black;
+    color: white;
+    font-family: "lin libertine" ;
+    text-align: center;
+}

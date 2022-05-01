@@ -1,0 +1,43 @@
+
+.colinh{
+    position:absolute;
+    top: 0;
+    margin-left: 5vw;
+    margin-top: 4vh;
+    color: #d0d0d0;
+    font-family: "Montserrat";
+    font-size: 3rem;
+}
+
+.globe{
+    animation: offhov 1s;
+    border-radius: 20vh;
+    margin: auto;
+    margin-top: 15vh;
+    width: 80vh;
+    height: 80vh;
+}
+
+.globe:hover{
+    animation: hov 1s;
+    transform: translate(0, -3vh);
+}
+
+@keyframes offhov{
+    from{
+        transform: translate(0, -3vh);
+    }
+    to{
+        transform: translate(0);
+    }
+}
+
+@keyframes hov{
+    from{
+        transform: translate(0);
+    }
+    to{
+        transform: translate(0, -3vh);
+
+    }
+}
