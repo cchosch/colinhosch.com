@@ -1,5 +1,4 @@
 
-
 .gwrapper{
     animation-fill-mode: forwards;
     border-radius: 100%;
@@ -7,15 +6,15 @@
     margin-top: 15vh;
     width: 80vh;
     height: 80vh;
+    transition: transform .5s;
 }
 
 .globe{
     z-index: -1;
     width: inherit;
     height: inherit;
-    transition: transform .5s;
 }
 
-.gwrapper:hover .globe{
+.gwrapper:hover {
     transform: translateY(-3vh);
 }
