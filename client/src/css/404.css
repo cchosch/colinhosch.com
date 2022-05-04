@@ -1,0 +1,11 @@
+
+.notfound{
+    display: table;
+    height: 95vh;
+    font-family: "Montserrat";
+    font-size: 10vh;
+    line-height: 95vh;
+    width: 100%;
+}
+
+

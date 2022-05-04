@@ -11,7 +11,7 @@ app.get("/", (req, res) => {
 
 
 app.get("/*", (req, res) => {
-    res.send("fuck you");
+    res.sendFile("404.html");
 });
 
 app.listen(port, () => {
