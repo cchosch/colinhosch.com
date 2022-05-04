@@ -1,11 +1,15 @@
+import React, {Component} from "react";
 import "./../css/header.css";
 
-function Header(){
-    return(<div>
-        <div className="colinh">Colin Hoscheit</div>
-        <model-viewer class="globe" camera-orbit="00deg 90deg 0deg"  src="./globe.glb" autoplay />
-    </div>)
+class Globe extends Component{
+    render(){
+        return(<div className="gwrapper">
+                <model-viewer  id="globe" class="globe" camera-orbit="00deg 90deg 0deg"  src="./models/globe.glb" autoplay />
+        </div>)
+    }
 }
 
 
-export default Header
+
+
+export default Globe;
