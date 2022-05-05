@@ -2,16 +2,12 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const port = 5427;
+const buildPath = path.join(__dirname, "/../client/build");
 
 app.use(express.static(path.join(__dirname, "/../client/build")));
 
-app.get("/", (req, res) => {
-    res.sendFile("index.html");
-});
-
-
 app.get("/*", (req, res) => {
-    res.sendFile("404.html");
+    res.sendFile(buildPath +"/index.html");
 });
 
 app.listen(port, () => {
