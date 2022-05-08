@@ -1,17 +1,21 @@
+import res from "express/lib/response";
 import App from "../client/src/App.js"
+import react from "react";
+import Home from "../client/src/components/home.jsx";
 const express = require("express");
-const React = require("react");
 const  ReactDOMServer = require('react-dom/server');
-import path from "path";
+const path = require("path");
+const fs = require("fs");
 const app = express();
 const port = 5427;
-const buildPath = path.join(__dirname, "/../client/build");
+const pubPath = path.join(__dirname, "/../client/public");
+const index = fs.readFileSync(path.join(pubPath, "index.html"), "utf-8");
 
-app.use(express.static(path.join(__dirname, "/../client/build")));
+app.use(express.static(pubPath));
 
 app.get("/*", (req, res) => {
-    ReactDOMServer.renderToString(<App/>);
-    res.send("cum");
+    var home = ReactDOMServer.renderToString(<Home/>);
+    res.send(index.replace("<div id=\"root\"></div>", `<div id="root">${home}</div>`));
 });
 
 

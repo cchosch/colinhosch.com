@@ -1,4 +1,5 @@
 import Globe from "./header.jsx";
+import react from "react";
 import "./../css/app.css";
 
 function Home() {

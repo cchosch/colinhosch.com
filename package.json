@@ -1,6 +1,10 @@
 {
     "name": "colinhosch.com",
     "version": "0.1.0",
+    "babel":{
+        "presets":["@babel/env", "@babel/preset-react"],
+        "plugins": ["@babel/plugin-syntax-jsx"]
+    },
     "scripts": {
         "dev:build-server": "NODE_ENV=development node_modules/.bin/webpack --config webpack.server.js --mode=development -w",
         "dev:start": "nodemon ./server-build/index.js",

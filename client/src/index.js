@@ -6,7 +6,7 @@ import reportWebVitals from './reportWebVitals';
 if (typeof window !== 'undefined'){
 ReactDOM.hydrate(
     <App />,
-  document.getElementById('oot')
+  document.getElementById('root')
 );}
 
 // If you want to start measuring performance in your app, pass a function
