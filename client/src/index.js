@@ -3,12 +3,11 @@ import ReactDOM from 'react-dom';
 import App from './App.js';
 import reportWebVitals from './reportWebVitals';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+if (typeof window !== 'undefined'){
+ReactDOM.hydrate(
+    <App />,
   document.getElementById('oot')
-);
+);}
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

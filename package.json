@@ -1,16 +1,30 @@
 {
     "name": "colinhosch.com",
-    "type": "module",
     "version": "0.1.0",
     "scripts": {
-        "start": "node src/index.js"
+        "dev:build-server": "NODE_ENV=development node_modules/.bin/webpack --config webpack.server.js --mode=development -w",
+        "dev:start": "nodemon ./server-build/index.js",
+        "dev": "npm run dev:build-server && npm run dev:start"
     },
     "dependencies": {
+        "@babel/core": "^7.17.10",
+        "@babel/preset-env": "^7.17.10",
+        "@babel/preset-react": "^7.16.7",
+        "@babel/register": "^7.17.7",
         "@testing-library/jest-dom": "^5.16.4",
+        "babel-loader": "^8.2.5",
         "express": "^4.18.1",
         "react": "^18.1.0",
         "react-dom": "^18.1.0",
         "react-router-dom": "^6.3.0",
-        "web-vitals": "^2.1.4"
+        "web-vitals": "^2.1.4",
+        "webpack": "^5.72.0",
+        "webpack-cli": "^4.9.2",
+        "webpack-node-externals": "^3.0.0"
+    },
+    "devDependencies": {
+        "css-loader": "^6.7.1",
+        "npm-run-all": "^4.1.5",
+        "style-loader": "^3.3.1"
     }
 }
