@@ -1,0 +1,13 @@
+
+.headshot {
+    border-radius: 50%;
+    width: 40svh;
+    aspect-ratio: 1 / 1;
+    border: 2px solid white;
+}
+
+@media screen and (max-width: 48rem) {
+    .headshot{
+        width: 300px;
+    }
+}
