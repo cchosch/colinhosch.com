@@ -8,6 +8,8 @@ import style from "./home.module.scss";
 export default function Home() {
     return (<>
         <Nav/>
+        <div className={style.backgroundGradient}></div>
+        <div className={style.background}></div>
         <div className="relative left-1/2 w-3/4 flex h-full justify-center items-center gap-16 flex-col mt-4 translate-x-[-50%]">
             <div className="flex gap-3 flex-col">
                 <img className={style.headshot}
