@@ -15,10 +15,6 @@
     --font-mono: 'JetBrainsMono' ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 }
 
-.font-mono {
-    font-family: 'JetBrainsMono' ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace !important;
-}
-
 @media (prefers-color-scheme: dark) {
     :root {
         --background: #0a0a0a;
