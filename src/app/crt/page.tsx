@@ -1,13 +1,18 @@
 "use client";
-import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+import { Canvas, useLoader, useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { STLLoader } from "three/examples/jsm/Addons.js";
 
 const CrtScene = () => { 
+
     return <div>
-        <Canvas camera={{position: [0, 0, 3], fov: 60}} style={{height: "100vh"}}>
-            <ambientLight intensity={Math.PI / 2}/>
+        <Canvas camera={{position: [5, 0, 0], fov: 80}} style={{height: "100vh"}}>
+            <ambientLight intensity={Math.PI / 4}/>
+            <spotLight intensity={Math.PI * 2} position={[5, 0, 0]} lookAt={[0, 0, 0]}></spotLight>
             <CrtMonitor/>
+            <OrbitControls/>
             
         </Canvas>
 
@@ -18,14 +23,26 @@ const CrtMonitor = () => {
     const screenRef = useRef<THREE.Mesh>(null);
     const [textTexture, setTextTexture] = useState<THREE.CanvasTexture | null>(null);
     const canvasRef = useRef(document.createElement("canvas"));
+    const geom = useLoader(STLLoader, "/crt.stl");
+    const {camera} = useThree();
+    const meshRef = useRef<THREE.Mesh>(null);
+    useEffect(() => {
+        if(meshRef.current) {
+
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
+        }
+    });
 
     useEffect(() => {
         const canvas = canvasRef.current;
         canvas.width = 2000;
         canvas.height = 2000;
         const ctx = canvas.getContext("2d");
-        if(!ctx)
+        if(!ctx) {
+
+            console.log("NO CANVAS");
             return;
+        }
 
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -49,7 +66,7 @@ const CrtMonitor = () => {
                 readIndex++;
                 ctx.fillStyle = "black";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = "lime";
+                ctx.fillStyle = "white";
                 ctx.font = "50px JetBrains Mono";
                 for(let i = 0; i < codeText.length; i++) {
                     ctx.fillText(codeText[i], 10, 60 * (i+1));
@@ -63,17 +80,17 @@ const CrtMonitor = () => {
     }, []);
 
     return <>
-        <group position={[0, 0, 0]} scale={1.5}>
+        <group position={[0, -1.5, 0]} scale={1.5}>
             {/* CRT Body */}
-            <mesh>
-                <boxGeometry args={[1.25, 1.25, 1]} />
-                <meshStandardMaterial color="#e3e1c9" />
+            <mesh ref={meshRef} position={[0, 0, 0]} rotation={[-Math.PI/2, 0, 0]}>
+                <primitive object={geom}  />
+                <meshStandardMaterial side={THREE.DoubleSide} attach="material" color="#e3e1c9" />
             </mesh>
 
             {/* Screen */}
-            {textTexture && (
-                <mesh ref={screenRef} position={[0, 0, 0.51]}>
-                    <planeGeometry args={[1, 1]} />
+            {true && (
+                <mesh ref={screenRef} position={[1.65, 1.1, 0]} rotation={[0, Math.PI/2, 0]}>
+                    <planeGeometry args={[1.8, 1.6]} />
                     <meshBasicMaterial map={textTexture} />
                 </mesh>
             )}
