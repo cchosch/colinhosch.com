@@ -1,0 +1,115 @@
+import * as THREE from "three";
+
+export type RenderState = {
+    readIndex: [number, number],
+    contentTexture: THREE.CanvasTexture,
+    glowTexture: THREE.CanvasTexture,
+    fullCode: [string, string][],
+    codeText: [string, string][][],
+    textureCanvas: HTMLCanvasElement,
+    glowCanvas: HTMLCanvasElement,
+    // 1 forward, -1 backward
+    direction: number
+};
+
+export function screenRenderLoop(renderState: RenderState) {
+    return () => {
+        if(renderState.direction > 0) {
+            if(!typeForward(renderState)) {
+                renderState.direction *= -1;
+                typeBackwards(renderState);
+            }
+        } else {
+            if(!typeBackwards(renderState)) {
+                renderState.direction = 1;
+                typeForward(renderState);
+            }
+        }
+
+
+        const {codeText, textureCanvas, glowCanvas, contentTexture, glowTexture} = renderState;
+        const gCtx = glowCanvas.getContext("2d");
+        const tCtx = textureCanvas.getContext("2d");
+        if(!tCtx || !gCtx) {
+            console.log("NO CANVAS");
+            return;
+        }
+        gCtx.fillStyle = "rgb(0, 0, 0)";
+        tCtx.fillStyle = "rgb(31, 31, 31)";
+        gCtx.fillRect(0, 0, glowCanvas.width, glowCanvas.height);
+        tCtx.fillRect(0, 0, textureCanvas.width, textureCanvas.height);
+        const offset = {x: 0, y: 0};
+
+        gCtx.font = "50px JetBrains Mono";
+        tCtx.font = "50px JetBrains Mono";
+        for(let i = 0; i < codeText.length; i++) {
+            offset.x = 0;
+            for(let j = 0; j < codeText[i].length; j++) {
+                gCtx.fillStyle = codeText[i][j][0];
+                tCtx.fillStyle = codeText[i][j][0];
+                gCtx.fillText(codeText[i][j][1], 10 + offset.x, (60 * (i+1)) + offset.y);
+                tCtx.fillText(codeText[i][j][1], 10 + offset.x, (60 * (i+1)) + offset.y);
+                offset.x += gCtx.measureText(codeText[i][j][1]).width;
+            }
+        }
+        contentTexture.needsUpdate = true;
+        glowTexture.needsUpdate = true;
+    };
+}
+
+function typeBackwards(renderState: RenderState): boolean {
+    const {codeText} = renderState;
+
+    const lastY = codeText.length-1;
+    const writeIndex = [lastY, codeText[lastY].length-1];
+    // if currently removing string is done
+    if(codeText[writeIndex[0]][writeIndex[1]][1].length === 0) {
+        // if at 0, 0 (start) return false and start going forwards
+        if(writeIndex[0] === 0 && writeIndex[1] === 0) {
+            renderState.readIndex = [0, 0];
+            return false;
+        }
+        // remove current string because it's length is 0
+        codeText[writeIndex[0]].pop();
+        // if we're at the start of this line pop it
+        if(writeIndex[1] === 0) {
+            codeText.pop();
+            writeIndex[0]--;
+            writeIndex[1] = codeText[writeIndex[0]].length-1;
+        } else {
+            writeIndex[1]--;
+        }
+    }
+
+    codeText[writeIndex[0]][writeIndex[1]][1] = codeText[writeIndex[0]][writeIndex[1]][1].substring(0, codeText[writeIndex[0]][writeIndex[1]][1].length-1);
+    return true;
+}
+
+function typeForward(renderState: RenderState): boolean {
+    // if at end of line
+    if(renderState.readIndex[0] >= renderState.fullCode.length ||
+        (renderState.readIndex[0] === renderState.fullCode.length-1 && renderState.readIndex[1] === renderState.fullCode[renderState.readIndex[0]][1].length)) {
+        return false;
+    }
+    const {readIndex, fullCode, codeText} = renderState;
+    // if at end of current segment
+    if(fullCode[readIndex[0]][1].length === readIndex[1]) {
+        readIndex[0]++;
+        readIndex[1] = 0;
+        if(codeText[codeText.length-1][codeText[codeText.length-1].length-1][1].length === 0)
+            codeText[codeText.length-1].pop();
+        codeText[codeText.length-1].push([fullCode[readIndex[0]][0], ""]);
+    }
+
+    const lastY = codeText.length-1;
+    const writeIndex = [lastY, codeText[lastY].length-1];
+    const currChar = fullCode[readIndex[0]][1][readIndex[1]];
+    if(currChar === "\n") {
+        codeText.push([[fullCode[readIndex[0]][0], ""]]);
+    } else {
+        console.log(codeText);
+        codeText[writeIndex[0]][writeIndex[1]][1] += currChar;
+    }
+    readIndex[1]++;
+    return true;
+}

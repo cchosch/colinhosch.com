@@ -113,8 +113,32 @@ textarea.contactInput {
     gap: 1rem;
     align-items: center;
 }
+.crtDisplay {
+    position: absolute !important;
+    height: 50vh !important;
+    width: 60vh !important;
+    top: 50% !important;
+    right: 0;
+    transform: translate(-10%, -50%);
+    border: 1px solid white !important;
+    z-index: -1;
+}
+.personInfo {
+    transition: 200ms ease all;
+    padding: 25px;
+    border-radius: 20px;
+}
+@media screen and (max-width: 1200px) {
+    .personInfo {
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+}
 
 @media screen and (max-width: 750px) {
+    .crtDisplay {
+        right: 50%;
+        transform: translate(50%, -50%);
+    }
     .headshot {
         width: 300px;
     }
