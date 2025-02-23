@@ -25,7 +25,7 @@ export default function Home() {
                         <div className="text-3xl">
                             Colin Hoscheit
                         </div>
-                        <div className="text-xl">Full stack consulting</div>
+                        <div className="text-xl">full stack consulting</div>
                         <div className={style.details}>
                             <div className="flex gap-1 items-center whitespace-nowrap">
                                 <LocationPin className="inline" fill="white" height="1.1rem"/>
