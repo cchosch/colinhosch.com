@@ -8,8 +8,9 @@ import typescript from "highlight.js/lib/languages/typescript";
 import { CSSProperties, FC, RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { codeToHtml } from "shiki";
 import * as THREE from "three";
-import { STLLoader } from "three/examples/jsm/Addons.js";
+import { MTLLoader, OBJLoader, TGALoader } from "three/examples/jsm/Addons.js";
 import { getCodeHighlights, screenRenderLoop } from "./crtType";
+import KeyboardModel from "./keyboard";
 
 hljs.registerLanguage("typescript", typescript);
 
@@ -44,13 +45,17 @@ export const Crt: FC<CrtProps> = ({style, className, showCanvas}) => {
     return <>
         <canvas ref={textureCanvasRef} style={{display: showCanvas ? undefined: "none", position: "absolute", aspectRatio: "1/1", height: "40svh"}}></canvas>
         {crtContent && textureCanvasRef.current && <Canvas className={className} camera={{position: [8, 0.5, 0], fov: 60}} style={style??{height: "100svh"}}>
-            {<ambientLight intensity={Math.PI / 8}/>}
-            <spotLight intensity={Math.PI * 20} position={[8, 0.5, 2]} lookAt={[0.5, -2, -2]}></spotLight>
+            {<ambientLight intensity={2}/>}
+            <spotLight intensity={10} position={[8, 0.5, 2]} lookAt={[0.5, -2, -2]}></spotLight>
+            <spotLight intensity={10} position={[-4, 0.5, 0]} lookAt={[0.5, -2, -2]}></spotLight>
+            <KeyboardModel position={[5, -1.5, 2]}/>
+
             <Selection>
                 <CrtMonitor textureCanvasRef={{current: textureCanvasRef.current}} highlighted={crtContent}/>
             </Selection>
             
-            <OrbitControls target={[0.5, -2, 3.5]}/>
+            {/*<OrbitControls target={[0, 0, 0]}/>*/}
+            {<OrbitControls target={[0.5, -2, 3.5]}/>/**/}
         </Canvas>}
     </>;
 };
@@ -58,7 +63,7 @@ export const Crt: FC<CrtProps> = ({style, className, showCanvas}) => {
 const CrtMonitor = ({textureCanvasRef, highlighted}: {textureCanvasRef: RefObject<HTMLCanvasElement>, highlighted: string}) => {
     const planeGeom = useMemo(() => {
             const width = 1.8;
-            const height = 1.7;
+            const height = 1.375;
             const plane = new THREE.PlaneGeometry(width, height, 20, 20);
             const positions = plane.attributes.position.array;
 
@@ -76,8 +81,50 @@ const CrtMonitor = ({textureCanvasRef, highlighted}: {textureCanvasRef: RefObjec
         }, []);
     const screenRef = useRef<THREE.Mesh>(null);
     const [textTexture, setTextTexture] = useState<THREE.CanvasTexture | null>(null);
-    const geom = useLoader(STLLoader, "/crt.stl");
-    const meshRef = useRef<THREE.Mesh>(null);
+
+    const materials = useLoader(MTLLoader, "/crt/proCRT.mtl");
+    const geom = useLoader(OBJLoader, "/crt/proCRT.obj", (loader) => {
+        materials.preload(); // Preload the materials
+        loader.setMaterials(materials); // Attach materials to the OBJ
+    });
+
+    const diffuseTexture = useLoader(TGALoader, '/crt/textures/CRTMonitor_Base_Color.tga');
+    const baseColor = useLoader(TGALoader, '/crt/textures/CRTMonitor_Base_Color.tga');
+    const normalMap = useLoader(TGALoader, '/crt/textures/CRTMonitor_Normal.tga');
+    const roughnessMap = useLoader(TGALoader, '/crt/textures/CRTMonitor_Roughness.tga');
+    const metallicMap = useLoader(TGALoader, '/crt/textures/CRTMonitor_Metallic.tga');
+    const aoMap = useLoader(TGALoader, '/crt/textures/CRTMonitor_Ambient_occlusion.tga');
+    const emissiveMap = useLoader(TGALoader, '/crt/textures/CRTMonitor_Emissive.tga');
+    const heightMap = useLoader(TGALoader, '/crt/textures/CRTMonitor_Height.tga');
+    const mat = useMemo(() => {
+        return new THREE.MeshStandardMaterial({
+            map: baseColor,              // Diffuse/albedo
+            // normalMap: normalMap,        // Normal map
+            roughnessMap: roughnessMap,  // Roughness
+            metalnessMap: metallicMap,   // Metallic
+            // aoMap: aoMap,                // Ambient occlusion
+            // emissiveMap: emissiveMap,    // Emissive
+            // emissive: new THREE.Color(0xffffff), // Enable emissive color
+            displacementMap: heightMap,  // Height (optional)
+            displacementScale: 0.1,      // Adjust this value as needed
+            side: THREE.DoubleSide
+        });
+    }, [baseColor, normalMap, roughnessMap, metallicMap, aoMap, emissiveMap, heightMap]);
+
+    // Apply textures to the material
+    useMemo(() => {
+        // Traverse the model to find the mesh and apply textures
+        geom.traverse((child) => {
+            if (child instanceof THREE.Mesh && child.isMesh) {
+                // Use a Standard Material (or Physical Material) for PBR
+                child.material = mat;
+
+                // Ensure UVs are set up for aoMap
+                child.geometry.attributes.uv2 = child.geometry.attributes.uv;
+                child.material.needsUpdate = true;
+            }
+        });
+    }, [geom, diffuseTexture]);
 
     useEffect(() => {
         const textureCanvas = textureCanvasRef.current;
@@ -93,10 +140,7 @@ const CrtMonitor = ({textureCanvasRef, highlighted}: {textureCanvasRef: RefObjec
         document.body.appendChild(testEl);
 
         const highlightedCode = getCodeHighlights(testEl);
-        console.log(highlightedCode);
 
-
-        // document.body.removeChild(testEl);
 
         const interId = setInterval(screenRenderLoop({
             codeText: [[[highlightedCode[0][0], ""]]],
@@ -113,17 +157,14 @@ const CrtMonitor = ({textureCanvasRef, highlighted}: {textureCanvasRef: RefObjec
     return <>
         <group position={[0, -1.5, 1]} scale={1.5}>
             {/* CRT Body */}
-            <mesh ref={meshRef} position={[0, 0, 0]} rotation={[-Math.PI/2, 0, 0]}>
-                <primitive object={geom}  />
-                <meshStandardMaterial emissiveIntensity={0} side={THREE.DoubleSide} attach="material" color="#e3e1c9" />
-            </mesh>
+            <primitive object={geom} position={[0.65, 0, 0]} rotation={[-Math.PI/2, 0, Math.PI/2]} scale={0.06}/>
 
             {/* Screen */}
             {textTexture && (
                 <Selection>
 
                     <Selection enabled>
-                        <mesh geometry={planeGeom} ref={screenRef} position={[1.5497, 1.1, 0]} rotation={[0, Math.PI/2, 0]}>
+                        <mesh geometry={planeGeom} ref={screenRef} position={[1.5497, 1.22, 0]} rotation={[0, Math.PI/2, 0]}>
                             
                             {/*<planeGeometry args={[1.8, 1.6]} />*/}
                                 <shaderMaterial

@@ -39,15 +39,27 @@ export function screenRenderLoop(renderState: RenderState) {
 
         const offset = {x: 0, y: 0};
         const lastLine = (10 + crtFontSize) * (codeText.length);
-        if(lastLine > textureCanvas.width * 0.9) {
-            offset.y = textureCanvas.width * 0.9-lastLine;
+        if(lastLine > textureCanvas.height * 0.9) {
+            offset.y = textureCanvas.height * 0.9-lastLine;
         }
+        const skip = Math.max(Math.floor(-offset.y / (10 + crtFontSize))-1, 0);
+        const baseXOffset = tCtx.measureText("0000  ").width;
+        const paddingWidth = tCtx.measureText("  ").width;
 
-        for(let i = 0; i < codeText.length; i++) {
-            offset.x = 0;
+        let cY = 0;
+        for(let i = skip; i < codeText.length; i++) {
+            offset.x = baseXOffset;
+            cY = (10 + crtFontSize) * (i+1) + offset.y;
+            if(i < codeText.length-1)
+                tCtx.fillStyle = "#6e7681";
+            else
+                tCtx.fillStyle = "#fff";
+            tCtx.fillText(`${i}`, ((baseXOffset-paddingWidth)-tCtx.measureText(`${i}`).width), cY);
             for(let j = 0; j < codeText[i].length; j++) {
-                tCtx.fillStyle = codeText[i][j][0];
-                tCtx.fillText(codeText[i][j][1], 10 + offset.x, ((10 + crtFontSize) * (i+1)) + offset.y);
+                if(codeText[i][j][1].trim().length > 0) {
+                    tCtx.fillStyle = codeText[i][j][0];
+                    tCtx.fillText(codeText[i][j][1], 10 + offset.x, cY);
+                }
                 offset.x += tCtx.measureText(codeText[i][j][1]).width;
             }
         }
@@ -140,7 +152,6 @@ const addBracketColors = (h: [string, string][]) => {
             const dir = getIFromChar(cChar);
             if(dir === null)
                 continue;
-            console.log(`${dir} ${cChar}`);
 
             if(dir < 0) {
                 colorI += dir;
@@ -172,7 +183,6 @@ const addBracketColors = (h: [string, string][]) => {
 
 const getChildHighlights = (el: Element): [string, string][] => {
     let innerHighlightedCode: [string, string][] = [];
-    console.log(el.childNodes);
     el.childNodes.forEach((node) => {
         if(node.nodeType === 3) {
             innerHighlightedCode.push(["rgb(255, 255, 255)", node.textContent!]);
