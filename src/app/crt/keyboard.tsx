@@ -1,5 +1,6 @@
 "use client";
-import { useLoader } from "@react-three/fiber";
+import { Text3D } from "@react-three/drei";
+import { useFrame, useLoader } from "@react-three/fiber";
 import { FC, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { MTLLoader, OBJLoader, STLLoader } from "three/examples/jsm/Addons.js";
@@ -9,6 +10,7 @@ type KeyboardModelProps = {
     position?: [number, number, number]
 };
 
+const keySize = 0.005;
 const KeyboardModel: FC<KeyboardModelProps> = ({position}) => {
     const [keys, setKeys] = useState<KeyModels | null>(null);
     const materials = useLoader(MTLLoader, "/keyboard/Keyboard.mtl");
@@ -17,9 +19,55 @@ const KeyboardModel: FC<KeyboardModelProps> = ({position}) => {
         loader.setMaterials(materials); // Attach materials to the OBJ
     });
     const groupRef = useRef<THREE.Group | null>(null);
+    const pressedKeys = useRef(new Map());
+    const legendLookup = useRef<{[key: string]: number}>({});
+
+    const material = useMemo(() => new THREE.MeshStandardMaterial({
+        emissiveIntensity: 0,
+        side: THREE.DoubleSide,
+        color: "#e3e1c9",
+    }), []);
+    const fontMat = useMemo(() => new THREE.MeshStandardMaterial({
+        side: THREE.DoubleSide,
+        color: "black"
+    }), []);
+    const dMat = useMemo(() => new THREE.MeshStandardMaterial({
+        emissiveIntensity: 0,
+        side: THREE.DoubleSide,
+        color: "#A09A8B"
+    }), []);
+    const setKeyPressed = (keyName: string, mesh: THREE.Object3D, value: boolean) => {
+        pressedKeys.current.set(keyName, {
+            pressed: value,
+            mesh
+        });
+    };
+
     useEffect(() => {
         getKeySizes().then(setKeys);
+        const keyListener = (dir: boolean) => {
+            return (ev: KeyboardEvent) => {
+                console.log(ev.key);
+                const cI = legendLookup.current[ev.key.toLowerCase()];
+                if(!cI || !groupRef.current)
+                    return;
+                console.log(groupRef.current.children[0].children[cI]);
+                const cKey = groupRef.current.children[0].children[cI];
+                if(cKey && cKey instanceof THREE.Group) {
+                    setKeyPressed(ev.key, cKey, dir);
+                }
+            };
+        }; 
+        const downL = keyListener(true);
+        const upL = keyListener(false);
+        addEventListener("keydown", downL);
+        addEventListener("keyup", upL);
+        return () => {
+            removeEventListener("keydown", downL);
+            removeEventListener("keyup", upL);
+        };
     }, []);
+
     useEffect(() => {
         if (!obj) {
             return;
@@ -34,25 +82,51 @@ const KeyboardModel: FC<KeyboardModelProps> = ({position}) => {
 
         groupRef.current?.add(obj);
     }, [obj]);
-    const material = useMemo(() => new THREE.MeshStandardMaterial({
-        emissiveIntensity: 0,
-        side: THREE.DoubleSide,
-        color: "#e3e1c9",
-    }), []);
-    const dMat = useMemo(() => new THREE.MeshStandardMaterial({
-        emissiveIntensity: 0,
-        side: THREE.DoubleSide,
-        color: "#A09A8B"
-    }), []);
+
+
+    // Animation loop for smooth keypress effect
+    useFrame(() => {
+        pressedKeys.current.forEach((state, keyId) => {
+            if (state.mesh) {
+                const targetZ = state.pressed ? -0.005 : 0; // Move down when pressed
+                state.mesh.position.z = THREE.MathUtils.lerp(state.mesh.position.z, targetZ, 0.2); // Smooth transition
+
+                if (Math.abs(state.mesh.position.z - targetZ) < 0.001) {
+                    if (!state.pressed)
+                        pressedKeys.current.delete(keyId); // Remove if returned to original position
+                }
+            }
+        });
+    });
+    const keyEls = useMemo(() => {
+        return <>
+            {keys && <group rotation={[-Math.PI/2, 0, 0]} position={[0, 0, 0]}>
+                {KeyPositions.map((pos, i) => {
+                    const offset: [number, number, number] = pos.offset ? [pos.offset[0]/1000, pos.offset[1]/1000, (pos.offset[2]??0)/1000] : [0, 0, 0];
+                    const r: [number, number, number] | undefined = pos.rotation ? [pos.rotation[0], pos.rotation[1], pos.rotation[2]??0] : undefined;
+                    if(pos.legend || pos.code) {
+                        const k = (pos.code ?? pos.legend)??"";
+
+                        legendLookup.current[k.toLowerCase()] = i;
+                    }
+                    keys[pos.model].computeBoundingSphere();
+                    keys[pos.model].computeBoundingBox();
+                    const keyBounding = keys[pos.model].boundingBox!;
+                    const lLoc = keys[pos.model].boundingSphere!.center;
+                    lLoc.x-=(keyBounding.max.x-keyBounding.min.x)/2;
+                    lLoc.x+=keySize+keySize/4;
+                    
+                    return <group rotation={r} key={`${i}${pos.legend}`} position={offset}>
+                        <instancedMesh  args={[keys[pos.model], pos.d ? dMat : material, 1]} ></instancedMesh>
+                        <Text3D material={fontMat} scale={keySize} height={0.01} position={[lLoc.x-keySize/2, lLoc.y-keySize/2, lLoc.z+0.0078]} font="JetBrains Mono_Regular.json">{pos.legend}</Text3D>
+                    </group>;
+                })}
+            </group>}
+        </>;
+    }, [keys, fontMat, dMat, material]);
 
     return <group ref={groupRef} position={position} rotation={[0, Math.PI/2.5, 0]} scale={7}>
-        {keys && <group rotation={[-Math.PI/2, 0, 0]} position={[0, 0, 0]}>
-            {KeyPositions.map((pos, i) => {
-                const offset: [number, number, number] = pos.offset ? [pos.offset[0]/1000, pos.offset[1]/1000, (pos.offset[2]??0)/1000] : [0, 0, 0];
-                const r: [number, number, number] | undefined = pos.rotation ? [pos.rotation[0], pos.rotation[1], pos.rotation[2]??0] : undefined;
-                return <instancedMesh key={`${i}${pos.legend}`} rotation={r} args={[keys[pos.model], pos.d ? dMat : material, 1]} position={offset}></instancedMesh>;
-            })}
-        </group>}
+        {keyEls}
     </group>;
 };
 

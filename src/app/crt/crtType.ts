@@ -63,6 +63,9 @@ export function screenRenderLoop(renderState: RenderState) {
                 offset.x += tCtx.measureText(codeText[i][j][1]).width;
             }
         }
+
+        tCtx.fillStyle = "white";
+        tCtx.fillText("|", 10 + offset.x, cY);
         contentTexture.needsUpdate = true;
     };
 }
@@ -116,6 +119,8 @@ function typeForward(renderState: RenderState): boolean {
     const currChar = fullCode[readIndex[0]][1][readIndex[1]];
     if(currChar === "\n") {
         codeText.push([[fullCode[readIndex[0]][0], ""]]);
+    } else if(currChar === "\t") {
+        codeText[writeIndex[0]][writeIndex[1]][1] += "    ";
     } else {
         codeText[writeIndex[0]][writeIndex[1]][1] += currChar;
     }
@@ -126,6 +131,7 @@ function typeForward(renderState: RenderState): boolean {
 export const getCodeHighlights = (el: Element): [string, string][] => {
     const h = getChildHighlights(el);
     addBracketColors(h);
+    spacesToTabs(h);
 
     return h;
 }
@@ -141,6 +147,11 @@ const getIFromChar = (c: string): number | null => {
     return (((i % 2)*2)-1)*-1;
 }
 
+const spacesToTabs = (h: [string, string][]) => {
+    for(let i = 0; i < h.length; i++) {
+        h[i][1] = h[i][1].replaceAll("    ", "\t");
+    }
+};
 
 const addBracketColors = (h: [string, string][]) => {
     let colorI = 0;

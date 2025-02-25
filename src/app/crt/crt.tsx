@@ -45,7 +45,7 @@ export const Crt: FC<CrtProps> = ({style, className, showCanvas}) => {
     return <>
         <canvas ref={textureCanvasRef} style={{display: showCanvas ? undefined: "none", position: "absolute", aspectRatio: "1/1", height: "40svh"}}></canvas>
         {crtContent && textureCanvasRef.current && <Canvas className={className} camera={{position: [8, 0.5, 0], fov: 60}} style={style??{height: "100svh"}}>
-            {<ambientLight intensity={2}/>}
+            {<ambientLight intensity={1.5}/>}
             <spotLight intensity={10} position={[8, 0.5, 2]} lookAt={[0.5, -2, -2]}></spotLight>
             <spotLight intensity={10} position={[-4, 0.5, 0]} lookAt={[0.5, -2, -2]}></spotLight>
             <KeyboardModel position={[5, -1.5, 2]}/>
@@ -62,23 +62,23 @@ export const Crt: FC<CrtProps> = ({style, className, showCanvas}) => {
 
 const CrtMonitor = ({textureCanvasRef, highlighted}: {textureCanvasRef: RefObject<HTMLCanvasElement>, highlighted: string}) => {
     const planeGeom = useMemo(() => {
-            const width = 1.8;
-            const height = 1.375;
-            const plane = new THREE.PlaneGeometry(width, height, 20, 20);
-            const positions = plane.attributes.position.array;
+        const width = 1.8;
+        const height = 1.375;
+        const plane = new THREE.PlaneGeometry(width, height, 20, 20);
+        const positions = plane.attributes.position.array;
 
-            for (let i = 0; i < positions.length; i += 3) {
-                const x = positions[i];
-                const y = positions[i + 1];
+        for (let i = 0; i < positions.length; i += 3) {
+            const x = positions[i];
+            const y = positions[i + 1];
 
-                // Apply curvature along X and Y axes
-                const curveAmount = -0.2 * (1 - (x / width) ** 2 - (y / height) ** 2);
-                positions[i + 2] = -curveAmount;
-            }
+            // Apply curvature along X and Y axes
+            const curveAmount = -0.2 * (1 - (x / width) ** 2 - (y / height) ** 2);
+            positions[i + 2] = -curveAmount;
+        }
 
-            plane.attributes.position.needsUpdate = true;
-            return plane;
-        }, []);
+        plane.attributes.position.needsUpdate = true;
+        return plane;
+    }, []);
     const screenRef = useRef<THREE.Mesh>(null);
     const [textTexture, setTextTexture] = useState<THREE.CanvasTexture | null>(null);
 
@@ -88,28 +88,15 @@ const CrtMonitor = ({textureCanvasRef, highlighted}: {textureCanvasRef: RefObjec
         loader.setMaterials(materials); // Attach materials to the OBJ
     });
 
-    const diffuseTexture = useLoader(TGALoader, '/crt/textures/CRTMonitor_Base_Color.tga');
     const baseColor = useLoader(TGALoader, '/crt/textures/CRTMonitor_Base_Color.tga');
-    const normalMap = useLoader(TGALoader, '/crt/textures/CRTMonitor_Normal.tga');
-    const roughnessMap = useLoader(TGALoader, '/crt/textures/CRTMonitor_Roughness.tga');
-    const metallicMap = useLoader(TGALoader, '/crt/textures/CRTMonitor_Metallic.tga');
-    const aoMap = useLoader(TGALoader, '/crt/textures/CRTMonitor_Ambient_occlusion.tga');
-    const emissiveMap = useLoader(TGALoader, '/crt/textures/CRTMonitor_Emissive.tga');
-    const heightMap = useLoader(TGALoader, '/crt/textures/CRTMonitor_Height.tga');
+
     const mat = useMemo(() => {
         return new THREE.MeshStandardMaterial({
             map: baseColor,              // Diffuse/albedo
-            // normalMap: normalMap,        // Normal map
-            roughnessMap: roughnessMap,  // Roughness
-            metalnessMap: metallicMap,   // Metallic
-            // aoMap: aoMap,                // Ambient occlusion
-            // emissiveMap: emissiveMap,    // Emissive
-            // emissive: new THREE.Color(0xffffff), // Enable emissive color
-            displacementMap: heightMap,  // Height (optional)
             displacementScale: 0.1,      // Adjust this value as needed
             side: THREE.DoubleSide
         });
-    }, [baseColor, normalMap, roughnessMap, metallicMap, aoMap, emissiveMap, heightMap]);
+    }, [baseColor]);
 
     // Apply textures to the material
     useMemo(() => {
@@ -124,14 +111,14 @@ const CrtMonitor = ({textureCanvasRef, highlighted}: {textureCanvasRef: RefObjec
                 child.material.needsUpdate = true;
             }
         });
-    }, [geom, diffuseTexture]);
+    }, [geom, mat]);
 
     useEffect(() => {
         const textureCanvas = textureCanvasRef.current;
         textureCanvas.width = 2000;
         textureCanvas.height = 2000;
 
-        const contentTexture = new THREE.CanvasTexture(textureCanvas);
+        const contentTexture = textTexture ?? new THREE.CanvasTexture(textureCanvas);
         setTextTexture(contentTexture);
 
         const testEl = document.createElement("div");
@@ -149,10 +136,10 @@ const CrtMonitor = ({textureCanvasRef, highlighted}: {textureCanvasRef: RefObjec
             textureCanvas,
             readIndex: [0, 0],
             direction: 1
-        }), 10);
+        }), 100);
 
         return () => clearInterval(interId);
-    }, []);
+    }, [textureCanvasRef, highlighted]);
 
     return <>
         <group position={[0, -1.5, 1]} scale={1.5}>
@@ -162,7 +149,6 @@ const CrtMonitor = ({textureCanvasRef, highlighted}: {textureCanvasRef: RefObjec
             {/* Screen */}
             {textTexture && (
                 <Selection>
-
                     <Selection enabled>
                         <mesh geometry={planeGeom} ref={screenRef} position={[1.5497, 1.22, 0]} rotation={[0, Math.PI/2, 0]}>
                             

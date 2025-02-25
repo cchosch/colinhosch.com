@@ -2,6 +2,7 @@ import { KeyModels } from "./keyboard";
 
 export type Key = {
     legend?: string,
+    code?: string,
     key?: string,
     model: keyof KeyModels,
     // mm, mm, mm
@@ -31,24 +32,28 @@ const arrowRow: Key[] = [
     },
     {
         legend: "←",
+        code: "arrowleft",
         model: "_1u_arrow",
         offset: [0, 1],
         d: true,
     },
     {
         legend: "↓",
+        code: "arrowdown",
         model: "_1u_arrow",
         offset: [k, 1],
         d: true,
     },
     {
         legend: ">",
+        code: "arrowright",
         model: "_1u_arrow",
         offset: [k * 2, 1],
         d: true,
     },
     {
         legend: "↑",
+        code: "arrowup",
         model: "_1u_zxc",
         offset: [k * 13.25, 1],
         d: true,
@@ -186,10 +191,6 @@ const homeRow: Key[] = [
         model: "_1u_home_row",
     },
     {
-        legend: "d",
-        model: "_1u_home_row",
-    },
-    {
         legend: "f",
         model: "_1u_home_row",
         offset: [k, 0]
@@ -267,11 +268,6 @@ const qwertyRow: Key[] = [
         model: "_1_5u",
         legend: "Tab",
         d: true,
-    },
-    {
-        model: "_1u_qwerty_row",
-        legend: "q",
-        offset: [-k*2, 0],
     },
     {
         model: "_1u_qwerty_row",
@@ -485,6 +481,7 @@ const numbersRow: Key[] = [
 const fRow: Key[] = [
     {
         legend: "Esc",
+        code: "escape",
         model: "_1u_f_row",
         offset: [-k*3, 0],
         d: true
