@@ -109,16 +109,26 @@ const KeyboardModel: FC<KeyboardModelProps> = ({position}) => {
 
                         legendLookup.current[k.toLowerCase()] = i;
                     }
+                    if(!pos.legendOffset) {
+                        pos.legendOffset = [0, 0];
+                    }
+                    if(!pos.legendOffset[2]) {
+                        pos.legendOffset[2] = 0;
+                    }
                     keys[pos.model].computeBoundingSphere();
                     keys[pos.model].computeBoundingBox();
                     const keyBounding = keys[pos.model].boundingBox!;
                     const lLoc = keys[pos.model].boundingSphere!.center;
                     lLoc.x-=(keyBounding.max.x-keyBounding.min.x)/2;
-                    lLoc.x+=keySize+keySize/4;
+                    const cKeySize = keySize * (pos.legendSize??1);
+                    lLoc.x+=cKeySize+cKeySize/4;
+                    lLoc.x += pos.legendOffset[0]/1000;
+                    lLoc.y += pos.legendOffset[1]/1000;
+                    lLoc.z += pos.legendOffset[2]/1000;
                     
                     return <group rotation={r} key={`${i}${pos.legend}`} position={offset}>
                         <instancedMesh  args={[keys[pos.model], pos.d ? dMat : material, 1]} ></instancedMesh>
-                        <Text3D material={fontMat} scale={keySize} height={0.01} position={[lLoc.x-keySize/2, lLoc.y-keySize/2, lLoc.z+0.0078]} font="JetBrains Mono_Regular.json">{pos.legend}</Text3D>
+                        <Text3D material={fontMat} scale={cKeySize} height={0.01} position={[lLoc.x-cKeySize/2, lLoc.y-cKeySize/2, lLoc.z+0.0078]} font="JetBrains Mono_Regular.json">{pos.legend}</Text3D>
                     </group>;
                 })}
             </group>}

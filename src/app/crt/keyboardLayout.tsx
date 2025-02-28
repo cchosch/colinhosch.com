@@ -2,6 +2,8 @@ import { KeyModels } from "./keyboard";
 
 export type Key = {
     legend?: string,
+    legendSize?: number,
+    legendOffset?: [number, number] | [number, number, number],
     code?: string,
     key?: string,
     model: keyof KeyModels,
@@ -17,7 +19,7 @@ const k = 19.2;
 // COLLAPSE IN IDE FOR READABILITY
 const arrowRow: Key[] = [
     {
-        legend: "Enter",
+        legend: "Ent",
         model: "_2u_vertical",
         d: true
     },
@@ -172,7 +174,9 @@ const zxcRow: Key[] = [
 
 const homeRow: Key[] = [
     {
-        legend: "Caps Lock",
+        legend: "Caps\nLock",
+        legendSize: 0.7,
+        legendOffset: [1, 2, -1],
         model: "caps_lock",
         d: true,
     },
@@ -236,7 +240,7 @@ const homeRow: Key[] = [
         offset: [k*9, 0]
     },
     {
-        legend: "Enter",
+        legend: "↵",
         model: "enter",
         d: true
     },
@@ -331,18 +335,24 @@ const qwertyRow: Key[] = [
 
     {
         legend: "Delete",
+        legendSize: 0.4,
+        legendOffset: [3, 0],
         model: "_1u_qwerty_row",
         offset: [k*12.07, 0],
         d: true,
     },
     {
         legend: "End",
+        legendSize: 0.4,
+        legendOffset: [3, 0],
         model: "_1u_qwerty_row",
         offset: [k*13.07, 0],
         d: true,
     },
     {
         legend: "Page Down",
+        legendSize: 0.25,
+        legendOffset: [3, 0],
         model: "_1u_qwerty_row",
         offset: [k*14.07, 0],
         d: true,
@@ -436,24 +446,32 @@ const numbersRow: Key[] = [
     },
     {
         legend: "Insert",
+        legendSize: 0.45,
+        legendOffset: [1.5, 0],
         model: "_1u_numbers_row",
         offset: [k*11.55, 0],
         d: true,
     },
     {
         legend: "Home",
+        legendSize: 0.45,
+        legendOffset: [3, 0],
         model: "_1u_numbers_row",
         offset: [k*12.55, 0],
         d: true,
     },
     {
         legend: "Page Up",
+        legendSize: 0.4,
+        legendOffset: [1.5, 0],
         model: "_1u_numbers_row",
         offset: [k*13.55, 0],
         d: true,
     },
     {
         legend: "Num Lock",
+        legendSize: 0.35,
+        legendOffset: [2, 0],
         model: "_1u_numbers_row",
         offset: [k*14.98, 0],
         d: true,
@@ -550,19 +568,25 @@ const fRow: Key[] = [
         offset: [k*11.05, 0],
     },
     {
-        legend: "Print Screen",
+        legend: "PntSc",
+        legendSize: 0.5,
+        legendOffset: [2, 0],
         model: "_1u_f_row",
         offset: [k*12.6, 0],
         d: true
     },
     {
-        legend: "Scroll Lock",
+        legend: "ScrLck",
+        legendSize: 0.45,
+        legendOffset: [2, 0],
         model: "_1u_f_row",
         offset: [k*13.6, 0],
         d: true
     },
     {
         legend: "Pause",
+        legendSize: 0.45,
+        legendOffset: [2, 0],
         model: "_1u_f_row",
         offset: [k*14.6, 0],
         d: true
