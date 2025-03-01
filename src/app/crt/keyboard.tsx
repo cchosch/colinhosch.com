@@ -47,14 +47,14 @@ const KeyboardModel: FC<KeyboardModelProps> = ({position}) => {
         getKeySizes().then(setKeys);
         const keyListener = (dir: boolean) => {
             return (ev: KeyboardEvent) => {
-                console.log(ev.key);
-                const cI = legendLookup.current[ev.key.toLowerCase()];
+                console.log(ev);
+                const c = ev.code.replace("Key", "").replace("Digit", "").toLowerCase();
+                const cI = legendLookup.current[c];
                 if(!cI || !groupRef.current)
                     return;
-                console.log(groupRef.current.children[0].children[cI]);
                 const cKey = groupRef.current.children[0].children[cI];
                 if(cKey && cKey instanceof THREE.Group) {
-                    setKeyPressed(ev.key, cKey, dir);
+                    setKeyPressed(c, cKey, dir);
                 }
             };
         }; 

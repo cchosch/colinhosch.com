@@ -72,7 +72,7 @@ const arrowRow: Key[] = [
         d: true,
     },
     {
-        key: " ",
+        code: "space",
         model: "space",
         offset: [0, 0]
     },
@@ -93,6 +93,7 @@ const arrowRow: Key[] = [
 const zxcRow: Key[] = [
     {
         legend: "shift",
+        code: "shiftleft",
         model: "_1_25u",
         d: true,
     },
@@ -147,6 +148,7 @@ const zxcRow: Key[] = [
     },
     {
         legend: "/",
+        code: "slash",
         model: "_1u_zxc",
         offset: [k*8, 0]
     },
@@ -241,6 +243,7 @@ const homeRow: Key[] = [
     },
     {
         legend: "↵",
+        code: "enter",
         model: "enter",
         d: true
     },
@@ -377,6 +380,7 @@ const qwertyRow: Key[] = [
 const numbersRow: Key[] = [
     {
         legend: "`",
+        code: "backquote",
         model: "_1u_numbers_row",
         offset: [-k*4, 0],
     },
@@ -431,11 +435,13 @@ const numbersRow: Key[] = [
     },
     {
         legend: "-",
+        code: "minus",
         model: "_1u_numbers_row",
         offset: [k*7, 0],
     },
     {
         legend: "+",
+        code: "equal",
         model: "_1u_numbers_row",
         offset: [k*8, 0],
     },
