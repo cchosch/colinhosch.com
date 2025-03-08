@@ -13,9 +13,9 @@
 .contactDialog {
     margin: 0;
     position: absolute;
-    left: 0;
+    right: 0;
     top: 50%;
-    transform: translate(-100%, -50%);
+    transform: translate(100%, -50%);
     color: white;
     background-color: black;
     padding: 1rem 2rem;
@@ -23,7 +23,7 @@
     border-radius: 0.25rem;
 
     &.open {
-        transform: translate(25px, -50%);
+        transform: translate(-25px, -50%);
     }
 
     & > button[data-is-close] {
@@ -115,23 +115,21 @@ textarea.contactInput {
 }
 .crtDisplay {
     position: absolute !important;
-    height: 50vh !important;
-    width: 60vh !important;
+    height: 60vh !important;
+    width: unset !important;
     top: 50% !important;
     right: 0;
+    aspect-ratio: 1.25/1;
     transform: translate(-10%, -50%);
     // border: 1px solid white !important;
     z-index: -1;
 }
-.personInfo {
+
+.infoCont {
     transition: 200ms ease all;
     padding: 25px;
     border-radius: 20px;
-}
-@media screen and (max-width: 1200px) {
-    .personInfo {
-        background-color: rgba(0, 0, 0, 0.2);
-    }
+    background-color: rgba(0, 0, 0, 0.25);
 }
 
 @media screen and (max-width: 750px) {
