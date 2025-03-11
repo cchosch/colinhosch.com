@@ -60,7 +60,12 @@ export const Crt: FC<CrtProps> = ({style, className, showCanvas}) => {
     </>;
 };
 
-const CrtMonitor = ({textureCanvasRef, highlighted}: {textureCanvasRef: RefObject<HTMLCanvasElement>, highlighted: string}) => {
+type CrtMonitorProps = {
+    textureCanvasRef: RefObject<HTMLCanvasElement>,
+    highlighted: string
+}
+
+const CrtMonitor: FC<CrtMonitorProps> = ({textureCanvasRef, highlighted}) => {
     const planeGeom = useMemo(() => {
         const width = 1.8;
         const height = 1.375;

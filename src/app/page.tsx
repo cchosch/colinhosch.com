@@ -15,7 +15,7 @@ export default async function Home() {
         <div className="min-h-100 flex items-center">
             <div className={style.backgroundGradient}></div>
             <div className={style.background}></div>
-            <div className="px-32 mt-4 flex w-full justify-center">
+            <div className="px-8 md:px-32 mt-4 flex w-full justify-center">
                 <div className={`flex h-full items-center gap-16 flex-col ${style.infoCont}`}>
                     <div className={`flex gap-3 flex-col font-mono items-center ${style.personInfo}`}>
                         <img className={style.headshot}
