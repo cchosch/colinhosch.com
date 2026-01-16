@@ -21,7 +21,7 @@ const LiveDate: FC<LiveDateProps> = ({tickMs, tickCb}) => {
         };
     }, [tickMs, tickCb]);
 
-    return <>{cont}</>;
+    return <div suppressHydrationWarning>{cont}</div>;
 };
 
 const formatDate = () => {
