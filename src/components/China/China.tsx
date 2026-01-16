@@ -36,7 +36,7 @@ const China: FC<ChinaMapProps> = async ({className, includeCities: ic, text: txt
                     ] as [
                         string,
                         CityDetails[0] & {tier: number}
-                    ]
+                    ];
                 });
             }).flat().filter(([_l, {tier}]) => tier < 4).map(([loc, coords]) => {
                 const [x, y] = projection([coords.lon, coords.lat])!;
