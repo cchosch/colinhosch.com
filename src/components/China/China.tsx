@@ -18,7 +18,7 @@ const China: FC<ChinaMapProps> = async ({className, includeCities: ic, text: txt
     const chinaColor = "black";
 
     return <div className={cC(styles.mapContainer, className)}>
-        <ChinaSvg fill={chinaColor} stroke={chinaColor} strokeWidth="0.1" height="550px"/>
+        <ChinaSvg fill={chinaColor} stroke={chinaColor} strokeWidth="1" height="550px"/>
         <svg xmlns="http://www.w3.org/2000/svg" className={styles.locationSvg} viewBox="0 0 774.04419 569.64088" >
             {
                 txt && <text fontFamily="WeirdSerif" className="select-none" letterSpacing={0} color="red" x="41.5%" y="60%" fontSize={80} textAnchor="middle" fill="red" fontStyle="italic" fontWeight="600">
