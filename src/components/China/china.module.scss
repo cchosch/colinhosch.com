@@ -1,0 +1,22 @@
+
+.mapContainer {
+
+    position: absolute;
+    aspect-ratio: 747.33 / 550;
+
+    & > svg {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.mapLocation {
+    position: absolute;
+    font-size: 0px;
+    height: 10px;
+    width: 10px;
+    border-radius: 5px;
+    background-color: red;
+}

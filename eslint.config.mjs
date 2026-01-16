@@ -15,7 +15,14 @@ const eslintConfig = [
         files: ["**/*.tsx"],
         rules: {
             semi: "error",
-            "@next/next/no-img-element": "off"
+            "@next/next/no-img-element": "off",
+            "@typescript-eslint/no-unused-vars": [
+                "warn",
+                {
+                    varsIgnorePattern: "^_",
+                    argsIgnorePattern: "^_"
+                },
+            ]
         }
     }
 ];
