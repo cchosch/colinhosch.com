@@ -36,6 +36,11 @@
         --foreground: #ededed;
     }
 }*/
+*,
+*::after,
+*::before {
+    box-sizing: border-box;
+}
 
 .loadingScreen {
     &.active {

@@ -1,0 +1,24 @@
+
+body:has(.loadingScreen.active) {
+    overflow: hidden;
+}
+
+.loadingScreen {
+    height: 0;
+    width: 100vw;
+    position: absolute;
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: 1s ease all;
+    backdrop-filter: blur(0);
+    pointer-events: none;
+    border-bottom: 2px solid transparent;
+
+    &.active {
+        pointer-events: all;
+        border-bottom: 2px solid white;
+        height: 100vh;
+        backdrop-filter: blur(10px);
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+}
