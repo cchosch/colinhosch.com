@@ -10,3 +10,44 @@
     top: 50%;
     transform: translate(-50%, -50%);
 }
+
+*:has(.map) {
+    height: fit-content;
+    align-self: center
+}
+.map {
+    position: sticky;
+    align-self: center;
+}
+
+.homeCont {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 3rem;
+    max-width: 100%;
+    height: calc(100vh - 60px);
+    & > * {
+        width: calc(50vw - 6rem);
+    }
+}
+
+.bio {
+    // background-color: rgba(0, 0, 0, 0.1);
+    padding: 0px 24px;
+    border-radius: 20px;
+    display: flex;
+    align-items: flex-start;
+
+    & > img {
+        //border: 2px solid black;
+        aspect-ratio: 1 / 2.25;
+        border-radius: 20px;
+        // width: 30vw;
+        width: 175px;
+    }
+    & > h1 {
+        font-size: 2rem;
+        font-weight: 550;
+        margin-left: 10px;
+    }
+}
