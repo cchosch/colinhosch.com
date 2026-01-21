@@ -13,9 +13,9 @@ type ChinaMapProps = {
 
 const China: FC<ChinaMapProps> = async ({className, includeCities: ic, text: txt}) => {
     const [width, height] = [747, 550];
-    const includeCities = ic??false;
+    const includeCities = ic??true;
     const projection =  d3.geoMercator().center([103.1, 38.5]).scale(724.5).translate([width / 2, height / 2]);
-    const chinaColor = "black";
+    const chinaColor = "#fbf8f2";
 
     return <div className={cC(styles.mapContainer, className)}>
         <ChinaSvg fill={chinaColor} stroke={chinaColor} strokeWidth="1" height="550px"/>

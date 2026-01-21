@@ -16,7 +16,7 @@ export default async function Home() {
                 </div>
             </div>
             <div>
-                <China className={styles.map} />
+                {<China className={styles.map} />}
             </div>
         </div>
     </div>);

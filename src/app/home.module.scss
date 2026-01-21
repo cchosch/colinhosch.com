@@ -11,13 +11,20 @@
     transform: translate(-50%, -50%);
 }
 
-*:has(.map) {
-    height: fit-content;
-    align-self: center
+*:has(> .map) {
+    height:  90%;
+    background-color: #d5e7f3;
+    align-self: center;
+    position: relative;
+    border-radius: 20px;
 }
 .map {
-    position: sticky;
     align-self: center;
+    margin: 10px;
+    width: calc(100% - 20px);
+    position: absolute;
+    top: 50%;
+    transform:translateY(-50%);
 }
 
 .homeCont {
