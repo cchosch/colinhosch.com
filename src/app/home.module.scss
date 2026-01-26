@@ -46,6 +46,7 @@
     align-items: flex-start;
 
     & > img {
+        user-select: none;
         //border: 2px solid black;
         aspect-ratio: 1 / 2.25;
         border-radius: 20px;

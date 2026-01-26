@@ -1,0 +1,24 @@
+
+.cursor {
+    z-index: 15;
+    mix-blend-mode: difference;
+    pointer-events: none;
+    will-change: transform;
+    justify-content: center;
+    align-items: center;
+    width: 10px;
+    height: 10px;
+    display: flex;
+    position: fixed;
+    top: -5px;
+    left: -5px;
+    background-color: white;
+    border-radius: 10px;
+
+    & > * {
+        background-color: black;
+        width: 4px;
+        height: 4px;
+        border-radius: 4px;
+    }
+}

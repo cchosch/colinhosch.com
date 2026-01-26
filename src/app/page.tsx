@@ -1,6 +1,5 @@
-import China from "@/components/China";
 import Nav from "@/components/Nav";
-import LensScene from "./_LensScene";
+import TSAScene from "./_TSAScene";
 import styles from "./home.module.scss";
 
 export default async function Home() {
@@ -12,11 +11,12 @@ export default async function Home() {
                 <img width="500" height={300} alt="meme" src="/headshot.png" />
                 <div className="w-full">
                     <div className="font-mono text-3xl text-center w-full font-extrabold"></div>
-                    <LensScene style={{width: "275px", height: "300px", overflow: "visible"}} />
+                    {/*<LensScene style={{width: "275px", height: "300px", overflow: "visible"}} />*/}
                 </div>
             </div>
             <div>
-                {<China className={styles.map} />}
+                <TSAScene style={{width: "100%", height: "800px", overflow: "visible"}} />
+                {/*<China className={styles.map} />*/}
             </div>
         </div>
     </div>);
