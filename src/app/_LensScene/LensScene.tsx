@@ -1,5 +1,5 @@
 "use client";
-import { useOverlayMaterial } from "@/util/three";
+import { useMeshStandardMaterial, useOverlayMaterial } from "@/util/three";
 import { Environment, MeshTransmissionMaterial, OrbitControls, OrthographicCamera, PerspectiveCamera, useGLTF } from "@react-three/drei";
 import { Canvas, CanvasProps, ThreeElements, useFrame, useThree } from "@react-three/fiber";
 import { FC, RefObject, useEffect, useMemo, useRef } from "react";
@@ -64,12 +64,14 @@ export const LensModel: FC<LensModelProps & ThreeElements["group"]> = (p) => {
         metalnessUrl: "/lens/TamronMetalness.png",
         color: "#2b2b2b"
     }, texLoader);
+
     const numbersMat = useOverlayMaterial({
         textureUrl: "/lens/tamron-numbers_texture.png",
         color: "#2b2b2b",
         roughness: 0.5,
         metalness: 0.8
     }, texLoader);
+
     // const rotationDir = useRef(1);
     const targetFocalLength = useRef(0);
     const startHoverTime = useRef(0);
@@ -86,8 +88,8 @@ export const LensModel: FC<LensModelProps & ThreeElements["group"]> = (p) => {
         zoomOnHover(zoomRingRef, zoomBarrelRef, targetFocalLength, startHoverTime);
     });
 
-    const RubberMat = new THREE.MeshStandardMaterial({ color: "#242425", metalness: 0, roughness: 0.9 });
-    const ZoomMat = new THREE.MeshStandardMaterial({ color: "#2b2b2b", metalness: 0.5, roughness: 0.7 });
+    const RubberMat = useMeshStandardMaterial({ color: "#242425", metalness: 0, roughness: 0.9 });
+    const ZoomMat = useMeshStandardMaterial({ color: "#2b2b2b", metalness: 0.5, roughness: 0.7 });
 
     const glassMat = useMemo(() =>
         <MeshTransmissionMaterial
@@ -99,6 +101,8 @@ export const LensModel: FC<LensModelProps & ThreeElements["group"]> = (p) => {
             backside
             transmissionSampler   // use main render target
         />, []);
+    if(mat.name === "loading")
+        return;
 
 
     return <group  ref={lensRef} {...p}>

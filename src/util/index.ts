@@ -1,5 +1,11 @@
 import { Vector2, Vector3 } from "three";
 
+export function capitalize(str: string): string {
+    if(str.length < 2)
+        return str.toUpperCase();
+    return str.charAt(0).toUpperCase() + str.substring(1);
+}
+
 /**
  * @param classes class names to combine
  * @returns class names separated by a space

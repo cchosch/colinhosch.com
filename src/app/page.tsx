@@ -1,5 +1,5 @@
 import Nav from "@/components/Nav";
-import TSAScene from "./_TSAScene";
+import TSASceneCli from "./_TSAScene";
 import styles from "./home.module.scss";
 
 export default async function Home() {
@@ -15,7 +15,7 @@ export default async function Home() {
                 </div>
             </div>
             <div>
-                <TSAScene style={{width: "100%", height: "800px", overflow: "visible"}} />
+                <TSASceneCli style={{width: "100%", height: "800px", overflow: "visible"}} />
                 {/*<China className={styles.map} />*/}
             </div>
         </div>
