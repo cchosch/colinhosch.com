@@ -1,0 +1,49 @@
+
+export type LoadWait = {
+    finished: () => void
+};
+
+const assetRegistry: string[] = [];
+
+export function registerAsset(url: string) {
+    if(assetRegistry.includes(url))
+        return;
+
+    assetRegistry.push(url);
+    console.log(countAssets());
+    console.log(assetRegistry);
+}
+export function countAssets(): number {
+    return assetRegistry.length;
+}
+
+export type LoadWaitEvent = {
+    id: string,
+    name: string,
+    unique: boolean,
+    status: "init" | "done"
+};
+
+export function bindLoadWait(name: string, unique: boolean=true): () => void {
+    const id = Math.floor(Math.random() * 16777215).toString(16);
+    window.postMessage({
+        loadEvent: {
+            id,
+            name,
+            unique,
+            status: "init"
+        }
+    });
+
+
+    return () => {
+        window.postMessage({
+            loadEvent: {
+                id,
+                name,
+                unique,
+                status: "done"
+            }
+        });
+    };
+}

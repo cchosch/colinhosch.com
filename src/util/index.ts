@@ -1,9 +1,18 @@
+import { useState } from "react";
 import { Vector2, Vector3 } from "three";
 
 export function capitalize(str: string): string {
     if(str.length < 2)
         return str.toUpperCase();
     return str.charAt(0).toUpperCase() + str.substring(1);
+}
+
+export function useUpdate(): (() => void) {
+    const [_s, setS] = useState(false);
+
+    return () => {
+        setS(s => !s);
+    };
 }
 
 /**
@@ -22,7 +31,7 @@ export const cC = (...classes: (string | undefined)[]): string => {
  *
  * allows you to put an event listener in your useEffect without removing the function from the function call
  */
-export const effectEvent = <K extends keyof DocumentEventMap>(type: K, listener: (ev: DocumentEventMap[K]) => void, options?: boolean | AddEventListenerOptions | undefined, target?: any): () => void => { // eslint-disable-line
+export const effectEvent = <K extends keyof WindowEventMap>(type: K, listener: (ev: WindowEventMap[K]) => void, options?: boolean | AddEventListenerOptions | undefined, target?: any): () => void => {
     if (!target)
         target = document;
     target.addEventListener(type, listener, options);
@@ -57,10 +66,10 @@ export function cubicInterpolate(points: Point[], x: number): number {
     const i2 = i + 1;
     const i3 = Math.min(pts.length - 1, i + 2);
 
-    const [_x0, y0] = pts[i0]; // eslint-disable-line
+    const [_x0, y0] = pts[i0];
     const [x1, y1] = pts[i1];
     const [x2, y2] = pts[i2];
-    const [_x3, y3] = pts[i3]; // eslint-disable-line
+    const [_x3, y3] = pts[i3];
 
     // Normalize x to t in [0, 1] between x1 and x2
     const t = (x - x1) / (x2 - x1);

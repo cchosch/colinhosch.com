@@ -12,7 +12,7 @@ const compat = new FlatCompat({
 const eslintConfig = [
     ...compat.extends("next/core-web-vitals", "next/typescript"),
     {
-        files: ["**/*.tsx"],
+        files: ["**/*.tsx", "**/*.ts"],
         rules: {
             semi: "error",
             "@next/next/no-img-element": "off",
@@ -22,7 +22,8 @@ const eslintConfig = [
                     varsIgnorePattern: "^_",
                     argsIgnorePattern: "^_"
                 },
-            ]
+            ],
+            "@typescript-eslint/no-explicit-any": "off"
         }
     }
 ];

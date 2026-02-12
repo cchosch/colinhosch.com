@@ -1,10 +1,14 @@
 "use client";
+import Environment from "@/components/Environment";
+import { getAssets, loadAssets, LoadedAssets } from "@/util/assetLoader";
 import { useMeshStandardMaterial, useOverlayMaterial } from "@/util/three";
-import { Environment, MeshTransmissionMaterial, OrbitControls, OrthographicCamera, PerspectiveCamera, useGLTF } from "@react-three/drei";
+import { useGLTF } from "@/util/threeHooks";
+import { MeshTransmissionMaterial, OrbitControls, OrthographicCamera, PerspectiveCamera } from "@react-three/drei";
 import { Canvas, CanvasProps, ThreeElements, useFrame, useThree } from "@react-three/fiber";
 import { FC, RefObject, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { rotateLens, zoomOnHover } from "./animations";
+
 
 
 const LensScene: FC<CanvasProps> = (p) => {
@@ -14,6 +18,8 @@ const LensScene: FC<CanvasProps> = (p) => {
     const setTargetFocalLengthRef = useRef((_l: number) => {});
     const leave = () => setTargetFocalLengthRef.current(17);
     const enter = () => setTargetFocalLengthRef.current(70);
+
+    loadAssets(lensAssets);
 
     return <Canvas  {...p}>
         {!ortho && <PerspectiveCamera makeDefault position={[10, 0.75, 0]} fov={23.5} />}
@@ -52,25 +58,37 @@ type LensModelProps = {
     setTargetFocalLength?: RefObject<(l: number) => void>
 };
 
+export const lensAssets = {
+  model: { kind: "gltf", url: "./lens/tamron_17-70.glb" },
+
+  bodyTexture:  { kind: "texture", url: "/lens/tamron_texture.png" },
+  bodyRoughness: { kind: "texture", url: "/lens/TamronRoughness.png" },
+  bodyMetalness: { kind: "texture", url: "/lens/TamronMetalness.png" },
+
+  numbersTexture: { kind: "texture", url: "/lens/tamron-numbers_texture.png" },
+} as const;
+type LensAssets = LoadedAssets<typeof lensAssets>;
+
 export const LensModel: FC<LensModelProps & ThreeElements["group"]> = (p) => {
+    const assets: LensAssets = getAssets(lensAssets);
+
     const zoomBarrelRef = useRef<THREE.Group>(null);
     const lensRef = useRef<THREE.Group>(null);
     const zoomRingRef = useRef<THREE.Group>(null);
-    const { nodes } = useGLTF("./lens/tamron_17-70.glb") as any; // eslint-disable-line
-    const texLoader = useMemo(() => new THREE.TextureLoader(), []);
+    const { nodes } = useGLTF("./lens/tamron_17-70.glb") as any;
     const mat = useOverlayMaterial({
-        textureUrl: "/lens/tamron_texture.png",
-        roughnessUrl: "/lens/TamronRoughness.png",
-        metalnessUrl: "/lens/TamronMetalness.png",
+        map: assets.bodyTexture,
+        roughnessMap: assets.bodyRoughness,
+        metalnessMap: assets.bodyMetalness,
         color: "#2b2b2b"
-    }, texLoader);
+    });
 
     const numbersMat = useOverlayMaterial({
-        textureUrl: "/lens/tamron-numbers_texture.png",
+        map: assets.numbersTexture,
         color: "#2b2b2b",
         roughness: 0.5,
         metalness: 0.8
-    }, texLoader);
+    });
 
     // const rotationDir = useRef(1);
     const targetFocalLength = useRef(0);
