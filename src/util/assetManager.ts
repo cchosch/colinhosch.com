@@ -22,7 +22,7 @@ export type LoadedAssets<T extends Record<string, AssetDescriptor>> = {
 };
 
 type NullableLoadedAssets<T extends Record<string, AssetDescriptor>> = {
-  [K in keyof LoadedAssets<T>]: LoadedAssets<T>[K] | undefined;
+    [K in keyof LoadedAssets<T>]: LoadedAssets<T>[K] | undefined;
 };
 
 export function successLoad<T extends Record<string, AssetDescriptor>>(
@@ -68,6 +68,6 @@ export function getAssets<T extends Record<string, AssetDescriptor>>(
     const ents =  entries.map(([key, desc]) => {
         return [key, getAsset(desc.url)];
     });
-    console.log(ents);
+
     return Object.fromEntries(ents) as LoadedAssets<T>;
 }

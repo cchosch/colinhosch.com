@@ -10,9 +10,8 @@ export function registerAsset(url: string) {
         return;
 
     assetRegistry.push(url);
-    console.log(countAssets());
-    console.log(assetRegistry);
 }
+
 export function countAssets(): number {
     return assetRegistry.length;
 }

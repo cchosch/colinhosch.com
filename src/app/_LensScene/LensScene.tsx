@@ -2,7 +2,6 @@
 import Environment from "@/components/Environment";
 import { getAssets, loadAssets, LoadedAssets } from "@/util/assetLoader";
 import { useMeshStandardMaterial, useOverlayMaterial } from "@/util/three";
-import { useGLTF } from "@/util/threeHooks";
 import { MeshTransmissionMaterial, OrbitControls, OrthographicCamera, PerspectiveCamera } from "@react-three/drei";
 import { Canvas, CanvasProps, ThreeElements, useFrame, useThree } from "@react-three/fiber";
 import { FC, RefObject, useEffect, useMemo, useRef } from "react";
@@ -72,10 +71,11 @@ type LensAssets = LoadedAssets<typeof lensAssets>;
 export const LensModel: FC<LensModelProps & ThreeElements["group"]> = (p) => {
     const assets: LensAssets = getAssets(lensAssets);
 
+    const { scene } = assets.model;
+
     const zoomBarrelRef = useRef<THREE.Group>(null);
     const lensRef = useRef<THREE.Group>(null);
     const zoomRingRef = useRef<THREE.Group>(null);
-    const { nodes } = useGLTF("./lens/tamron_17-70.glb") as any;
     const mat = useOverlayMaterial({
         map: assets.bodyTexture,
         roughnessMap: assets.bodyRoughness,
@@ -131,7 +131,7 @@ export const LensModel: FC<LensModelProps & ThreeElements["group"]> = (p) => {
         */}
 
         <group position={[0, -1, 0]}  scale={25.005}>
-            <mesh position={[0, 0, 0]} geometry={nodes["Focus_Ring"].geometry} castShadow receiveShadow material={RubberMat}>
+            <mesh position={[0, 0, 0]} geometry={scene.getObjectByName("Focus_Ring")!} castShadow receiveShadow material={RubberMat}>
             </mesh>
 
             <group ref={zoomRingRef}>

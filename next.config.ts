@@ -3,9 +3,7 @@ import { NextConfig } from "next/dist/server/config-shared";
 const nextConfig: NextConfig = {
     reactStrictMode: false,
     // ... other Next.js config options ...
-    webpack(config, ctx) {
-        console.log(config);
-        console.log(ctx);
+    webpack(config, _ctx) {
         // Grab the existing rule that handles SVG imports
         const fileLoaderRule = config.module.rules.find(
             (rule: {test?: RegExp}) => rule.test?.test?.('.svg')

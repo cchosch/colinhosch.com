@@ -46,7 +46,13 @@ export function getSnapshot(): AssetSnapshot {
     };
 }
 
-export function subscribeAssets(listener: Listener) {
+export function useSubscribeAssets(listener: Listener) {
+    useEffect(() => {
+        return subscribeAssets(listener);
+    }, []); // eslint-disable-line
+}
+
+function subscribeAssets(listener: Listener) {
     listeners.add(listener);
     listener(getSnapshot());
     return () => {
@@ -146,7 +152,6 @@ export function useAssetsFinished(): boolean {
         subscribeAssets((l) => {
             if(l.loaded === l.total)
                 setF(true);
-            console.log(l);
         });
     }, []);
 

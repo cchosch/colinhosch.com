@@ -6,12 +6,13 @@ export type IconProps = {
     height?: SVGAttributes<SVGSVGElement>["height"],
     fill?: SVGAttributes<SVGSVGElement>["fill"],
     onClick?: SVGAttributes<SVGSVGElement>["onClick"],
+    stroke?: SVGAttributes<SVGSVGElement>["stroke"],
 }
 
 
 export function iconTemplate(viewBox: string, children: JSX.Element): FC<IconProps> {
-    const IconTemp: FC<IconProps> = ({fill, width, height, className}) => {
-        return <svg viewBox={viewBox} fill={fill} height={height} width={width} className={className}>
+    const IconTemp: FC<IconProps> = ({fill, width, height, stroke, className}) => {
+        return <svg viewBox={viewBox} fill={fill} stroke={stroke} height={height} width={width} className={className}>
             {children}
         </svg>;
     };

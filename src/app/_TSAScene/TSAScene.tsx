@@ -1,5 +1,5 @@
 "use client";
-import { environmentAssets } from "@/components/Environment";
+import Environment, { environmentAssets } from "@/components/Environment";
 import { getAssets, loadAssets, useAssetsFinished } from "@/util/assetLoader";
 import { bindLoadWait } from "@/util/loadingState";
 import { OrbitControls, OrthographicCamera, PerspectiveCamera } from "@react-three/drei";
@@ -10,14 +10,14 @@ import { lensAssets, LensModel } from "../_LensScene/LensScene";
 
 const TSAScene: FC<CanvasProps> = (p) => {
     const ortho = false;
-    const orbital = true;
+    const orbital = false;
 
     const setTargetFocalLengthRef = useRef((_l: number) => {});
     const leave = () => setTargetFocalLengthRef.current(17);
     const enter = () => setTargetFocalLengthRef.current(70);
     const firstFrame = useRef<() => void>(null);
     if(firstFrame.current === null) {
-        firstFrame.current = bindLoadWait("first_frame");
+        firstFrame.current = bindLoadWait("first_frame", false);
     }
 
     useEffect(() => {
@@ -43,12 +43,12 @@ const TSAScene: FC<CanvasProps> = (p) => {
             {*/}
             <TSAModel />
             <LensModel/>
+            <Environment/>
 
             <InitCam orbital={orbital}/>
             {/*<LensModel setTargetFocalLength={setTargetFocalLengthRef}/>*/}
-            <mesh onAfterRender={() => {
+            <mesh onBeforeRender={() => {
                 if(firstFrame.current) {
-                    console.log("yere");
                     firstFrame.current();
                     firstFrame.current = null;
                 }
