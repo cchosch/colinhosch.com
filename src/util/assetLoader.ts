@@ -1,23 +1,30 @@
 "use client";
+import { Mutex } from "async-mutex";
 import { useEffect, useState } from "react";
 import * as THREE from "three";
 import { GLTF, GLTFLoader, RGBELoader } from "three/examples/jsm/Addons.js";
-import { AssetDescriptor, LoadedType } from "./assetLoader";
+import { AssetDescriptor, LoadedType, type AssetKind, type LoadTypes } from "./assetLoader";
 export * from "@/util/assetManager";
 
-export type AssetStatus = "pending" | "loading" | "loaded" | "error";
+export type AssetStatus = "loading" | "error";
 
-type AnyExcept<ExcludedType, T> = T extends ExcludedType ? never : T;
-
-export type AssetRecord<T = any> = {
-    url: string;
-    status: "pending" | "loading" | "error" | AnyExcept<string, T>;
-    error?: unknown;
-}
+export type AssetRecord<T extends AssetKind=AssetKind> = {
+    url: string,
+    m: Mutex,
+} & ({
+    status: "loading";
+} | {
+    status: "error";
+    error: unknown;
+} | {
+    status: "loaded",
+    value: LoadTypes[T];
+});
 
 export interface AssetSnapshot {
     total: number;
     loaded: number;
+    percentage: number;
     assets: Record<string, AssetRecord>;
 }
 
@@ -34,22 +41,15 @@ function emit() {
     listeners.forEach(l => l(snapshot));
 }
 
-// Public API
-
-export function getSnapshot(): AssetSnapshot {
+function getSnapshot(): AssetSnapshot {
     const total = Object.keys(assets).length;
-    const loaded = Object.values(assets).filter(a => typeof a.status !== "string").length;
+    const loaded = Object.values(assets).filter(a => a.status === "loaded").length;
     return {
         total,
         loaded,
+        percentage: (loaded / Math.max(total, 1)) * 100,
         assets: { ...assets },
     };
-}
-
-export function useSubscribeAssets(listener: Listener) {
-    useEffect(() => {
-        return subscribeAssets(listener);
-    }, []); // eslint-disable-line
 }
 
 function subscribeAssets(listener: Listener) {
@@ -60,10 +60,19 @@ function subscribeAssets(listener: Listener) {
     };
 }
 
+// Public API
+
+
+export function useSubscribeAssets(listener: Listener) {
+    useEffect(() => {
+        return subscribeAssets(listener);
+    }, []); // eslint-disable-line
+}
+
 export async function loadEnvironment(
   url: string
-): Promise<THREE.Texture | undefined> {
-    return await loadAsset(
+): Promise<THREE.DataTexture | undefined> {
+    return await loadAsset<"environment">(
         url,
         async (u: string) => {
             const loader = new RGBELoader(loadingManager);
@@ -77,7 +86,7 @@ export async function loadEnvironment(
 }
 
 export async function loadTexture(url: string): Promise<THREE.Texture | undefined> {
-    return await loadAsset(
+    return await loadAsset<"texture">(
         url,
         async (u: string) => {
             const loader = new THREE.TextureLoader(loadingManager);
@@ -86,7 +95,7 @@ export async function loadTexture(url: string): Promise<THREE.Texture | undefine
     );
 }
 export async function loadGLTF(url: string): Promise<GLTF | undefined> {
-    return await loadAsset(
+    return await loadAsset<"gltf">(
         url,
         async (u: string) => {
             const loader = new GLTFLoader(loadingManager);
@@ -95,61 +104,82 @@ export async function loadGLTF(url: string): Promise<GLTF | undefined> {
     );
 }
 
-async function loadAsset<T = any>(
+async function loadAsset<T extends AssetKind>(
     url: string,
-    loader: (url: string) => Promise<AnyExcept<string, T>>
-): Promise<T | undefined> {
+    loader: (url: string) => Promise<LoadTypes[T]>
+): Promise<LoadTypes[T] | undefined> {
     let rec = assets[url] as AssetRecord<T> | undefined;
 
     if (!rec) {
-        rec = { url, status: "pending" };
+        rec = { url, status: "loading", m: new Mutex() };
         assets[url] = rec;
+        emit();
     }
 
-    // Already loaded or loading: just return existing record
-    if (typeof rec.status !== "string") {
-        return rec.status;
+    // Already loaded: return existing record
+    if (rec.status === "loaded") {
+        return rec.value;
     }
 
-    // Start new load
-    rec.status = "loading";
-    try {
-        const value: AnyExcept<string, T> = await loader(url);
-        const current = assets[url] as AssetRecord<T> | undefined;
-        if (!current) return value;
+    const release = await rec.m.acquire();
 
-        current.status = value; 
-        emit();
-
-        return value;
-    } catch (err) {
-        const current = assets[url] as AssetRecord<T> | undefined;
-        if (!current) throw err;
-
-        current.status = "error";
-        current.error = err;
-        emit();
-
-        console.error(err);
+    const current = assets[url] as AssetRecord<T> | undefined;
+    if(!current) {
+        console.error(`Asset "${url}" was removed while another instance was waiting on it...`);
+        release();
         return;
     }
+    if(current.status === "loaded") {
+        release();
+        return current.value;
+    }
+
+    let value: LoadTypes[T] | undefined = undefined;
+    let newVal: AssetRecord | undefined = undefined;
+    try {
+        value = await loader(url);
+
+        newVal = {
+            url,
+            status: "loaded",
+            value,
+            m: current.m
+        };
+    } catch (err) {
+        console.error(err);
+
+        newVal = {
+            url,
+            status: "error",
+            error: err,
+            m: current.m
+        };
+    } finally {
+        if(newVal) {
+            assets[url] = newVal;
+            emit();
+        }
+        release();
+    }
+    return value;
 }
 
 export function getAsset<T extends AssetDescriptor>(
     url: string
 ): LoadedType<T> {
-    if(typeof assets[url].status === "string") {
-        throw new Error("Something went wrong");
+    const asset = assets[url];
+    if(!asset || asset.status !== "loaded") {
+        throw new Error(`Asset "${url}" retreived before it was loaded`);
     }
 
-    return assets[url].status as LoadedType<T>;
+    return asset.value as LoadedType<T>;
 }
 
 export function useAssetsFinished(): boolean {
     const [f, setF] = useState(false);
 
     useEffect(() => {
-        subscribeAssets((l) => {
+        return subscribeAssets((l) => {
             if(l.loaded === l.total)
                 setF(true);
         });

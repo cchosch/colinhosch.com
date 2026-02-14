@@ -1,3 +1,5 @@
+$successColor: rgb(12, 236, 34);
+$waitingColor: black;
 
 body:has(.loadingScreen.active) {
     overflow: hidden;
@@ -23,6 +25,29 @@ body:has(.loadingScreen.active) {
     line-height: 2;
 }
 
+.statusCont {
+    position: relative;
+    &::after,
+    &::before {
+        content: "";
+        position: absolute;
+        width: 0.2rem;
+        top: 0.4rem;
+        left: 0.4rem;
+        z-index: -1;
+        border-radius: 1rem;
+    }
+    &::after {
+        transition: 300ms ease height;
+        height: var(--loading-height);
+        background-color: $successColor;
+    }
+    &::before {
+        height: calc(100% - 0.8rem);
+        background-color: $waitingColor;
+    }
+}
+
 .progBarCont {
     display: flex;
     align-items: center;
@@ -45,6 +70,9 @@ body:has(.loadingScreen.active) {
     }
     &.success > svg {
         fill: rgb(12, 236, 34);
+        & path {
+            background-color: white;
+        }
     }
 
 }

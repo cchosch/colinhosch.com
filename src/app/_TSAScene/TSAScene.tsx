@@ -29,6 +29,7 @@ const TSAScene: FC<CanvasProps> = (p) => {
     const finished = useAssetsFinished();
     if(!finished)
         return <></>;
+    return <></>;
 
     return <Canvas  {...p}>
             {!ortho && <PerspectiveCamera makeDefault position={[10, 0.75, 0]} fov={23.5} />}
@@ -81,7 +82,6 @@ const tsaAssets = {
 
 const TSAModel:  FC<TsaModelProps> = (props) => {
     const { model } = getAssets(tsaAssets);
-    console.log(model);
 
     return <primitive  object={model.scene} {...props} />;
     /*
