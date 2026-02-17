@@ -43,7 +43,7 @@ const loadMap: LoadMap = {
     "environment": loadEnvironment
 };
 
-export function loadAsset<D extends AssetDescriptor>(
+function loadAsset<D extends AssetDescriptor>(
     desc: D
 ): Promise<LoadedType<D> | undefined> {
     const loader = loadMap[desc.kind] as (
@@ -53,18 +53,28 @@ export function loadAsset<D extends AssetDescriptor>(
     return loader(desc.url);
 }
 
-export async function loadAssets<T extends Record<string, AssetDescriptor>>(
-    defs: T
-): Promise<NullableLoadedAssets<T> | LoadedAssets<T>> {
-    const entries = Object.entries(defs) as [keyof T, T[keyof T]][];
+const assetQueue: AssetDescriptor[] = [];
 
-    const results = await Promise.all(
-        entries.map(([key, desc]) => 
-            loadAsset(desc).then(asset => [key, asset])
+// Public API
+
+export function queueAssets<T extends Record<string, AssetDescriptor>>(
+    defs: T
+) {
+    const newAssets = Object.values(defs).filter(({url}) => {
+        return assetQueue.find(({url: u2}) => u2 === url) === undefined;
+    });
+
+    if(newAssets.length > 0)
+        assetQueue.push(...newAssets);
+}
+
+export async function loadAllAssets() {
+    await Promise.all(
+        assetQueue.map((desc) => 
+            loadAsset(desc).then(asset => asset)
         )
     );
 
-    return Object.fromEntries(results) as NullableLoadedAssets<T>;
 }
 
 export function getAssets<T extends Record<string, AssetDescriptor>>(

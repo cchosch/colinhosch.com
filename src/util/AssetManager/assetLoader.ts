@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import * as THREE from "three";
 import { GLTF, GLTFLoader, RGBELoader } from "three/examples/jsm/Addons.js";
 import { AssetDescriptor, LoadedType, type AssetKind, type LoadTypes } from "./assetLoader";
-export * from "@/util/assetManager";
+export * from "@/util/AssetManager/assetManager";
 
 export type AssetStatus = "loading" | "error";
 
@@ -36,6 +36,30 @@ const assets: Record<string, AssetRecord> = {};
 const loadingManager = new THREE.LoadingManager();
 const listeners = new Set<Listener>();
 
+const MAX_CONCURRENT_LOADS = 1;
+let activeLoads = 0;
+const pending: (() => void)[] = [];
+
+function acquireSlot(): Promise<void> {
+    return new Promise(resolve => {
+        if (activeLoads < MAX_CONCURRENT_LOADS) {
+            activeLoads++;
+            resolve();
+        } else {
+            pending.push(() => {
+                activeLoads++;
+                resolve();
+            });
+        }
+    });
+}
+
+function releaseSlot() {
+    activeLoads--;
+    const next = pending.shift();
+    if (next) next();
+}
+
 function emit() {
     const snapshot: AssetSnapshot = getSnapshot();
     listeners.forEach(l => l(snapshot));
@@ -61,7 +85,6 @@ function subscribeAssets(listener: Listener) {
 }
 
 // Public API
-
 
 export function useSubscribeAssets(listener: Listener) {
     useEffect(() => {
@@ -90,7 +113,13 @@ export async function loadTexture(url: string): Promise<THREE.Texture | undefine
         url,
         async (u: string) => {
             const loader = new THREE.TextureLoader(loadingManager);
-            return await loader.loadAsync(u);
+            const tex = await loader.loadAsync(u);
+            tex.generateMipmaps = true;
+            // tex.needsUpdate = true;
+
+            // sRGB for color textures
+            tex.flipY = false;
+            return tex;
         }
     );
 }
@@ -103,6 +132,8 @@ export async function loadGLTF(url: string): Promise<GLTF | undefined> {
         }
     );
 }
+
+
 
 async function loadAsset<T extends AssetKind>(
     url: string,
@@ -121,18 +152,24 @@ async function loadAsset<T extends AssetKind>(
         return rec.value;
     }
 
-    const release = await rec.m.acquire();
+    const r1 = await rec.m.acquire();
 
     const current = assets[url] as AssetRecord<T> | undefined;
     if(!current) {
         console.error(`Asset "${url}" was removed while another instance was waiting on it...`);
-        release();
+        r1();
         return;
     }
     if(current.status === "loaded") {
-        release();
+        r1();
         return current.value;
     }
+
+    await acquireSlot();
+    const release = () => {
+        releaseSlot();
+        r1();
+    };
 
     let value: LoadTypes[T] | undefined = undefined;
     let newVal: AssetRecord | undefined = undefined;

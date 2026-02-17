@@ -1,6 +1,6 @@
 "use client";
 import Environment from "@/components/Environment";
-import { buildGLTFGraph, getAssets, loadAssets, LoadedAssets } from "@/util/assetLoader";
+import { buildGLTFGraph, getAssets, loadAllAssets, queueAssets, useAssetsFinished } from "@/util/AssetManager/assetLoader";
 import { useMeshStandardMaterial, useOverlayMaterial } from "@/util/three";
 import { MeshTransmissionMaterial, OrbitControls, OrthographicCamera, PerspectiveCamera } from "@react-three/drei";
 import { Canvas, CanvasProps, ThreeElements, useFrame, useThree } from "@react-three/fiber";
@@ -18,7 +18,14 @@ const LensScene: FC<CanvasProps> = (p) => {
     const leave = () => setTargetFocalLengthRef.current(17);
     const enter = () => setTargetFocalLengthRef.current(70);
 
-    loadAssets(lensAssets);
+    useEffect(() => {
+        loadAllAssets();
+    }, []);
+
+    const finished = useAssetsFinished();
+
+    if(!finished)
+        return <></>;
 
     return <Canvas  {...p}>
         {!ortho && <PerspectiveCamera makeDefault position={[10, 0.75, 0]} fov={23.5} />}
@@ -66,10 +73,11 @@ export const lensAssets = {
 
   numbersTexture: { kind: "texture", url: "/lens/tamron-numbers_texture.png" },
 } as const;
-type LensAssets = LoadedAssets<typeof lensAssets>;
+
+queueAssets(lensAssets);
 
 export const LensModel: FC<LensModelProps & ThreeElements["group"]> = (p) => {
-    const assets: LensAssets = getAssets(lensAssets);
+    const assets = getAssets(lensAssets);
     const {nodes} = useMemo(() => buildGLTFGraph(assets.model), [assets]);
 
     const zoomBarrelRef = useRef<THREE.Group>(null);
@@ -118,8 +126,6 @@ export const LensModel: FC<LensModelProps & ThreeElements["group"]> = (p) => {
             backside
             transmissionSampler   // use main render target
         />, []);
-    if(mat.name === "loading")
-        return;
 
 
     return <group  ref={lensRef} {...p}>

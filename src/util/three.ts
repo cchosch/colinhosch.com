@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import * as THREE from "three";
 
 // ThreeJS specific helper functions
@@ -18,16 +18,13 @@ type OverlayMaterialParams = {
  * @returns {THREE.MeshStandardMaterial} Material combining the material and texture, based on the alpha channel
  */
 export function useOverlayMaterial(meshOptions: OverlayMaterialParams): THREE.MeshStandardMaterial {
-    const [material, setMaterial] = useState(new THREE.MeshStandardMaterial({name: "loading"}));
-    const matParams: THREE.MeshStandardMaterialParameters  = {
-        transparent: false,
-        roughness: meshOptions.roughnessMap ? 1 : undefined,
-        metalness: meshOptions.metalnessMap ? 1 : undefined,
-        ...meshOptions,
-    };
-
-    useEffect(() => {
-        const mat = new THREE.MeshStandardMaterial(matParams);
+    return useMemo(() => {
+        const mat = new THREE.MeshStandardMaterial({
+            transparent: false,
+            roughness: meshOptions.roughnessMap ? 1 : undefined,
+            metalness: meshOptions.metalnessMap ? 1 : undefined,
+            ...meshOptions,
+        });
 
         mat.onBeforeCompile = (shader) => {
             // Replace how the color map is applied: mix baseColor and texture by alpha
@@ -47,8 +44,6 @@ export function useOverlayMaterial(meshOptions: OverlayMaterialParams): THREE.Me
             );
         };
 
-        setMaterial(mat);
+        return mat;
     }, []); // eslint-disable-line
-
-    return material;
 }

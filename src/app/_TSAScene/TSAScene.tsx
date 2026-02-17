@@ -1,62 +1,42 @@
 "use client";
-import Environment, { environmentAssets } from "@/components/Environment";
-import { getAssets, loadAssets, useAssetsFinished } from "@/util/assetLoader";
-import { bindLoadWait } from "@/util/loadingState";
+import Environment from "@/components/Environment";
+import { getAssets, queueAssets } from "@/util/AssetManager";
+import AssetSuspense from "@/util/AssetManager/AssetSuspense";
 import { OrbitControls, OrthographicCamera, PerspectiveCamera } from "@react-three/drei";
 import { Canvas, CanvasProps, ThreeElements, useThree } from "@react-three/fiber";
 import { FC, useEffect, useRef } from "react";
 import * as THREE from "three";
-import { lensAssets, LensModel } from "../_LensScene/LensScene";
+import { LensModel } from "../_LensScene/LensScene";
 
 const TSAScene: FC<CanvasProps> = (p) => {
     const ortho = false;
-    const orbital = false;
+    const orbital = true;
 
     const setTargetFocalLengthRef = useRef((_l: number) => {});
     const leave = () => setTargetFocalLengthRef.current(17);
     const enter = () => setTargetFocalLengthRef.current(70);
-    const firstFrame = useRef<() => void>(null);
-    if(firstFrame.current === null) {
-        firstFrame.current = bindLoadWait("first_frame", false);
-    }
-
-    useEffect(() => {
-        loadAssets(lensAssets);
-        loadAssets(tsaAssets);
-        loadAssets(environmentAssets);
-    }, []);
-
-    const finished = useAssetsFinished();
-    if(!finished)
-        return <></>;
-    return <></>;
 
     return <Canvas  {...p}>
             {!ortho && <PerspectiveCamera makeDefault position={[10, 0.75, 0]} fov={23.5} />}
             {ortho && <OrthographicCamera makeDefault position={[0, 0.9, 10]} scale={0.005}/>}
             {orbital && <OrbitControls/>}
-            {/*}
-            {*/}
+
             <ambientLight intensity={0.1} />
             <directionalLight position={[5, 3, 4]} intensity={1} />
 
-            {/*}
-            {*/}
-            <TSAModel />
-            <LensModel/>
-            <Environment/>
+            <AssetSuspense>
+                {//<TSAModel />
+}
+                <LensModel/>
+                <Environment/>
+            </AssetSuspense>
 
-            <InitCam orbital={orbital}/>
-            {/*<LensModel setTargetFocalLength={setTargetFocalLengthRef}/>*/}
-            <mesh onBeforeRender={() => {
-                if(firstFrame.current) {
-                    firstFrame.current();
-                    firstFrame.current = null;
-                }
-            }} position={[1, 0.75, 0]} rotation={[0, Math.PI /2, 0]} scale={1} onPointerLeave={leave} onPointerEnter={enter}>
+            <mesh  position={[1, 0.75, 0]} rotation={[0, Math.PI /2, 0]} scale={1} onPointerLeave={leave} onPointerEnter={enter}>
                 <planeGeometry args={[2, 3.5]}></planeGeometry>
                 <meshStandardMaterial color={"#ffffff"} transparent opacity={0}/>
             </mesh>
+
+            <InitCam orbital={orbital}/>
     </Canvas>;
 };
 
@@ -79,6 +59,8 @@ type TsaModelProps = ThreeElements['group'];
 const tsaAssets = {
     model: {kind: "gltf", url: "./tsa/scanner/tsa_scanner.glb"}
 } as const;
+
+queueAssets(tsaAssets);
 
 const TSAModel:  FC<TsaModelProps> = (props) => {
     const { model } = getAssets(tsaAssets);

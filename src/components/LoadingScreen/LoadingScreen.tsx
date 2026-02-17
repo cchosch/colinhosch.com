@@ -1,7 +1,7 @@
 "use client";
 import Check from "@/Icon/Check";
 import { cC, effectEvent } from "@/util";
-import { useSubscribeAssets } from "@/util/assetLoader";
+import { useSubscribeAssets } from "@/util/AssetManager/assetLoader";
 import { type LoadWaitEvent } from "@/util/loadingState";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./loadingscreen.module.scss";
@@ -21,7 +21,7 @@ const useProgBar = (): ProgressBar | null => {
 };
 
 
-const disabled = true;
+const disabled = false;
 const LoadingScreen = () => {
     const loadingScreen = useRef<HTMLDivElement>(null);
     const statusRef = useRef<HTMLDivElement>(null);
@@ -124,7 +124,7 @@ const LoadingScreen = () => {
                 </div>
                 <div className={cC(styles.progBarCont, styles.loadCheck, currStage >= 3 ? styles.success : "")}>
                     <Check />
-                    <div>Assets {pb?.loaded??0}/{pb?.total??'?'} ({percentage.toFixed().padStart(3, "-")}%)</div>
+                    <div>Assets {pb?.loaded??0}/{pb?.total??'?'} ({percentage.toFixed().padStart(3, "_")}%)</div>
                     <div style={{"--loaded": `${percentage.toFixed(3)}%`} as any} className={styles.progBar}/>
                 </div>
                 <div className={cC(styles.loadCheck, currStage >= 4 ? styles.success : "")}>
