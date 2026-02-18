@@ -23,16 +23,6 @@ export type LoadedAssets<T extends Record<string, AssetDescriptor>> = {
     [K in keyof T]: LoadedType<T[K]>;
 };
 
-type NullableLoadedAssets<T extends Record<string, AssetDescriptor>> = {
-    [K in keyof LoadedAssets<T>]: LoadedAssets<T>[K] | undefined;
-};
-
-export function successLoad<T extends Record<string, AssetDescriptor>>(
-    assets: NullableLoadedAssets<T>
-): assets is LoadedAssets<T> {
-    return !Object.values(assets).some(v => v === undefined);
-}
-
 type LoadMap = {
     [key in AssetKind]: (url: string) => Promise<LoadTypes[key] | undefined>;
 }
@@ -41,7 +31,7 @@ const loadMap: LoadMap = {
     "gltf": loadGLTF,
     "texture": loadTexture,
     "environment": loadEnvironment
-};
+} as const;
 
 function loadAsset<D extends AssetDescriptor>(
     desc: D
@@ -71,7 +61,7 @@ export function queueAssets<T extends Record<string, AssetDescriptor>>(
 export async function loadAllAssets() {
     await Promise.all(
         assetQueue.map((desc) => 
-            loadAsset(desc).then(asset => asset)
+            loadAsset(desc)
         )
     );
 

@@ -1,5 +1,6 @@
-import { useState } from "react";
 import { Vector2, Vector3 } from "three";
+import "./countries";
+export * from "./hooks";
 
 export function capitalize(str: string): string {
     if(str.length < 2)
@@ -7,12 +8,10 @@ export function capitalize(str: string): string {
     return str.charAt(0).toUpperCase() + str.substring(1);
 }
 
-export function useUpdate(): (() => void) {
-    const [_s, setS] = useState(false);
-
-    return () => {
-        setS(s => !s);
-    };
+export const waitFor = (ms: number): Promise<void> => {
+    return new Promise((res, _) => {
+        setTimeout(res, ms);
+    });
 }
 
 /**

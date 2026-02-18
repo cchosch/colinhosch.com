@@ -6,6 +6,11 @@ import { type LoadWaitEvent } from "@/util/loadingState";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./loadingscreen.module.scss";
 
+export const LoadingEvents = {
+    INIT_WAIT: "init",
+    FINISH_WAIT: "done",
+};
+
 type ProgressBar = {
     total: number,
     loaded: number,
@@ -78,10 +83,10 @@ const LoadingScreen = () => {
                 id = id.split(":")[1];
 
             switch(loadEvent.status) {
-                case "init":
+                case LoadingEvents.INIT_WAIT:
                     addLoadingBlock(id);
                     break;
-                case "done":
+                case LoadingEvents.FINISH_WAIT:
                     removeLoadingBlock(id);
             }
         }, undefined, window);

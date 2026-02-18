@@ -1,5 +1,4 @@
 import Cursor from "@/components/Cursor";
-import LoadingScreen from "@/components/LoadingScreen";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.scss";
@@ -32,7 +31,6 @@ export default function RootLayout({
             </head>
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} >
                 <Cursor/>
-                <LoadingScreen/>
                 {children}
             </body>
         </html>

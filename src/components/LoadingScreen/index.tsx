@@ -1,3 +1,4 @@
-import LoadingScreen from "./LoadingScreen";
+import LoadingScreen, { LoadingEvents } from "./LoadingScreen";
 
+export { LoadingEvents };
 export default LoadingScreen;

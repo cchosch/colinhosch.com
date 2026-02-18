@@ -78,7 +78,7 @@ queueAssets(lensAssets);
 
 export const LensModel: FC<LensModelProps & ThreeElements["group"]> = (p) => {
     const assets = getAssets(lensAssets);
-    const {nodes} = useMemo(() => buildGLTFGraph(assets.model), [assets]);
+    const { nodes } = useMemo(() => buildGLTFGraph(assets.model), [assets]);
 
     const zoomBarrelRef = useRef<THREE.Group>(null);
     const lensRef = useRef<THREE.Group>(null);

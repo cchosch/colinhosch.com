@@ -84,57 +84,6 @@ function subscribeAssets(listener: Listener) {
     };
 }
 
-// Public API
-
-export function useSubscribeAssets(listener: Listener) {
-    useEffect(() => {
-        return subscribeAssets(listener);
-    }, []); // eslint-disable-line
-}
-
-export async function loadEnvironment(
-  url: string
-): Promise<THREE.DataTexture | undefined> {
-    return await loadAsset<"environment">(
-        url,
-        async (u: string) => {
-            const loader = new RGBELoader(loadingManager);
-            // RGBELoader.loadAsync returns a DataTexture
-            const texture = await loader.loadAsync(u);
-            texture.mapping = THREE.EquirectangularReflectionMapping;
-            texture.needsUpdate = true;
-            return texture;
-        }
-    );
-}
-
-export async function loadTexture(url: string): Promise<THREE.Texture | undefined> {
-    return await loadAsset<"texture">(
-        url,
-        async (u: string) => {
-            const loader = new THREE.TextureLoader(loadingManager);
-            const tex = await loader.loadAsync(u);
-            tex.generateMipmaps = true;
-            // tex.needsUpdate = true;
-
-            // sRGB for color textures
-            tex.flipY = false;
-            return tex;
-        }
-    );
-}
-export async function loadGLTF(url: string): Promise<GLTF | undefined> {
-    return await loadAsset<"gltf">(
-        url,
-        async (u: string) => {
-            const loader = new GLTFLoader(loadingManager);
-            return await loader.loadAsync(u);
-        }
-    );
-}
-
-
-
 async function loadAsset<T extends AssetKind>(
     url: string,
     loader: (url: string) => Promise<LoadTypes[T]>
@@ -200,6 +149,56 @@ async function loadAsset<T extends AssetKind>(
     }
     return value;
 }
+
+// Public API
+
+export function useSubscribeAssets(listener: Listener) {
+    useEffect(() => {
+        return subscribeAssets(listener);
+    }, []); // eslint-disable-line
+}
+
+export async function loadEnvironment(
+  url: string
+): Promise<THREE.DataTexture | undefined> {
+    return await loadAsset<"environment">(
+        url,
+        async (u: string) => {
+            const loader = new RGBELoader(loadingManager);
+            // RGBELoader.loadAsync returns a DataTexture
+            const texture = await loader.loadAsync(u);
+            texture.mapping = THREE.EquirectangularReflectionMapping;
+            texture.needsUpdate = true;
+            return texture;
+        }
+    );
+}
+
+export async function loadTexture(url: string): Promise<THREE.Texture | undefined> {
+    return await loadAsset<"texture">(
+        url,
+        async (u: string) => {
+            const loader = new THREE.TextureLoader(loadingManager);
+            const tex = await loader.loadAsync(u);
+            tex.generateMipmaps = true;
+            // tex.needsUpdate = true;
+
+            // sRGB for color textures
+            tex.flipY = false;
+            return tex;
+        }
+    );
+}
+export async function loadGLTF(url: string): Promise<GLTF | undefined> {
+    return await loadAsset<"gltf">(
+        url,
+        async (u: string) => {
+            const loader = new GLTFLoader(loadingManager);
+            return await loader.loadAsync(u);
+        }
+    );
+}
+
 
 export function getAsset<T extends AssetDescriptor>(
     url: string

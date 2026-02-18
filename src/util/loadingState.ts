@@ -1,3 +1,4 @@
+import { LoadingEvents } from "@/components/LoadingScreen";
 
 export type LoadWait = {
     finished: () => void
@@ -30,7 +31,7 @@ export function bindLoadWait(name: string, unique: boolean=true): () => void {
             id,
             name,
             unique,
-            status: "init"
+            status: LoadingEvents.INIT_WAIT
         }
     });
 
@@ -41,7 +42,7 @@ export function bindLoadWait(name: string, unique: boolean=true): () => void {
                 id,
                 name,
                 unique,
-                status: "done"
+                status: LoadingEvents.FINISH_WAIT
             }
         });
     };
