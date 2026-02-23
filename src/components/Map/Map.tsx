@@ -3,8 +3,9 @@ import { cC, effectEvent } from "@/util";
 import { Country } from "@/util/countries";
 import * as d3 from "d3-geo";
 import { FC, useEffect, useMemo, useRef } from "react";
-import GlassBtn from "./Btn";
+import GlassHover from "./Btn";
 import locations, { CityDetails } from "./cities";
+import GridSvg from "./GridSvg";
 import styles from "./map.module.scss";
 
 type MapProps = {
@@ -22,7 +23,7 @@ const Map: FC<MapProps> = ({className, includeCities: ic, text: txt}) => {
     const landColor = "#fbf8f2";
     const scale = 1.5;
     const translate = {
-        x: 100,
+        x: 150,
         y: 0
     };
     const locArr = useMemo(() => Object.entries(locations).map(([t, n]) => {
@@ -39,6 +40,7 @@ const Map: FC<MapProps> = ({className, includeCities: ic, text: txt}) => {
             ];
         });
     }).flat(), []);
+
     const updateCityPings = ({clientX: x, clientY: y}: {clientX: number, clientY: number}) => {
         const citiesCont = citiesContRef.current;
         if(!citiesCont)
@@ -47,19 +49,10 @@ const Map: FC<MapProps> = ({className, includeCities: ic, text: txt}) => {
         const cities = citiesCont.children;
         const offset = citiesCont.parentElement!.getBoundingClientRect();
         const tolerance = 400;
-        x = svgWidth * (x - offset.x) / offset.width;
-        y = svgHeight * (y -  offset.y) / offset.height;
-        const lensCircle = document.querySelector<SVGCircleElement>("#lensCircle");
-        const lensMapShape = document.querySelector<SVGCircleElement>("#lensMapShape");
 
-        if (lensCircle) {
-        lensCircle.setAttribute("cx", x.toFixed(4));
-        lensCircle.setAttribute("cy", y.toFixed(4));
-        }
-        if (lensMapShape) {
-        lensMapShape.setAttribute("cx", x.toFixed(4));
-        lensMapShape.setAttribute("cy", y.toFixed(4));
-        }
+
+        x = svgWidth * (x - offset.x) / offset.width;
+        y = svgHeight * (y - offset.y) / offset.height;
 
 
         let closest: [number, Element] | null = null;
@@ -89,99 +82,51 @@ const Map: FC<MapProps> = ({className, includeCities: ic, text: txt}) => {
     useEffect(() => {
         return effectEvent("mousemove", updateCityPings);
     }, []);
+    const config = useMemo(() => {return {
+        start: [-50, -410] as [number, number],
+        end: [1850, 1600] as [number, number],
+        count: 30
+    };}, []);
 
-    return <div className={cC(styles.mapContainer, className)}>
+    return <>
+        <div className={styles.pContainer} >
+            <GridSvg viewBoxWidth={svgWidth} viewBoxHeight={svgHeight} config={config} stroke="black" strokeWidth={1}/>
+        </div>
 
-        <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`}>
-            <defs>
-                <radialGradient id="lensMap" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor="rgb(128,128,128)" />
-                    <stop offset="70%" stopColor="rgb(255,128,128)" />
-                    <stop offset="100%" stopColor="rgb(128,128,128)" />
-                </radialGradient>
+        <GlassHover/>
 
-                <circle id="lensMapShape" cx="0" cy="0" r="80" fill="url(#lensMap)" />
+        <div className={cC(styles.mapContainer, className)}>
+            <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`}>
 
-                <mask id="lensMask">
-                    <rect width="100%" height="100%" fill="black" />
-                    <circle id="lensCircle" cx="80" cy="80" r="80" fill="white" />
-                </mask>
+                <circle cx={0} cy={0} r="2" fill="red" />
+                <circle cx={680} cy={500} r="2" fill="red" />
 
-                <filter id="magnify"
-                        x="-50%" y="-50%" width="200%" height="200%"
-                        colorInterpolationFilters="sRGB">
-                <feImage
-                    x="-80" y="-80" width="160" height="160"
-                    preserveAspectRatio="xMidYMid slice"
-                    result="map"
-                    href="data:image/svg+xml;utf8,
-                    <svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'>
-                        <defs>
-                        <radialGradient id='g' cx='50%%' cy='50%%' r='50%%'>
-                            <stop offset='0%%' stop-color='rgb(128,128,128)'/>
-                            <stop offset='70%%' stop-color='rgb(255,128,128)'/>
-                            <stop offset='100%%' stop-color='rgb(128,128,128)'/>
-                        </radialGradient>
-                        </defs>
-                        <rect width='160' height='160' fill='url(#g)'/>
-                    </svg>"
-                />
-
-                <feDisplacementMap
-                    in="SourceGraphic"
-                    in2="map"
-                    scale="40"
-                    xChannelSelector="R"
-                    yChannelSelector="G"
-                />
-                </filter>
-
-            </defs>
-
-            <g>
-                {/* normal map */}
-                <g opacity="1">
-                    <circle cx={0} cy={0} r="2" fill="red" />
-                    <circle cx={680} cy={500} r="2" fill="red" />
-                    <g transform={`translate(${translate.x.toFixed(4)} ${translate.y.toFixed(4)}) scale(${scale.toFixed(4)})`}>
+                <g transform={`translate(${translate.x.toFixed(4)} ${translate.y.toFixed(4)}) scale(${scale.toFixed(4)})`}>
                     <Country strokeWidth={1} stroke="black" name="kyrgyzstan" fill={landColor} />
                     <Country strokeWidth={1} stroke="black" name="china" fill={landColor} />
-                    </g>
+                    <Country strokeWidth={1} stroke="black" name="kazakhstan" fill={landColor} />
                 </g>
 
-                {/* distorted copy, clipped to lens mask */}
-                <g
-                    style={{ mask: "url(#lensMask)", filter: "url(#magnify)" }}
-                    filterUnits="userSpaceOnUse"
-                >
-                    <circle cx={0} cy={0} r="2" fill="red" />
-                    <circle cx={680} cy={500} r="2" fill="red" />
-                    <g transform={`translate(${translate.x.toFixed(4)} ${translate.y.toFixed(4)}) scale(${scale.toFixed(4)})`}>
-                    <Country strokeWidth={1} stroke="black" name="kyrgyzstan" fill={landColor} />
-                    <Country strokeWidth={1} stroke="black" name="china" fill={landColor} />
-                    </g>
+
+                {
+                    txt && <text fontFamily="WeirdSerif" className="select-none" letterSpacing={0} color="red" x="41.5%" y="60%" fontSize={80} textAnchor="middle" fill="red" fontStyle="italic" fontWeight="600">
+                        {txt}
+                    </text>
+                }
+
+                <g ref={citiesContRef}>
+                    {includeCities && locArr.filter(([_l, {tier}]) => tier < 4).map(([loc, coords]) => {
+                        const [x, y] = projection([coords.lon, coords.lat])!;
+                        const tX = (x * scale) + translate.x;
+                        const tY = (y * scale) + translate.y;
+
+                        return <circle cy={tY.toFixed(4)} cx={tX.toFixed(4)} data-location={loc} key={loc} r="2" fill="red" />;
+                    })}
                 </g>
-            </g>
 
-            {
-                txt && <text fontFamily="WeirdSerif" className="select-none" letterSpacing={0} color="red" x="41.5%" y="60%" fontSize={80} textAnchor="middle" fill="red" fontStyle="italic" fontWeight="600">
-                    {txt}
-                </text>
-            }
-
-            <g ref={citiesContRef}>
-                {includeCities && locArr.filter(([_l, {tier}]) => tier < 4).map(([loc, coords]) => {
-                    const [x, y] = projection([coords.lon, coords.lat])!;
-                    const tX = (x * scale) + translate.x;
-                    const tY = (y * scale) + translate.y;
-
-                    return <circle cy={tY.toFixed(4)} cx={tX.toFixed(4)} data-location={loc} key={loc} r="2" fill="red" />;
-                })}
-            </g>
-
-        </svg>
-        <GlassBtn/>
-        {/*<ChinaSvg fill={landColor} stroke={landColor} strokeWidth="1" height="550px"/>*/}
-    </div>;
+            </svg>
+            {/*<ChinaSvg fill={landColor} stroke={landColor} strokeWidth="1" height="550px"/>*/}
+        </div>
+    </>;
 };
 export default Map;

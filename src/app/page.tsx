@@ -15,7 +15,7 @@ export default async function Home() {
                     <LensScene style={{width: "275px", height: "300px", overflow: "visible"}} />
                 </div>
             </div>
-            <div>
+            <div >
                 {/*<TSASceneCli style={{width: "100%", height: "800px", overflow: "visible"}} />*/}
                 <Map className={styles.map} />
             </div>
