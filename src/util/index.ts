@@ -1,6 +1,9 @@
+import { DependencyList, useEffect, useRef } from "react";
 import { Vector2, Vector3 } from "three";
 import "./countries";
 export * from "./hooks";
+
+export type VoidFn = () => void;
 
 export function capitalize(str: string): string {
     if(str.length < 2)
@@ -12,7 +15,7 @@ export const waitFor = (ms: number): Promise<void> => {
     return new Promise((res, _) => {
         setTimeout(res, ms);
     });
-}
+};
 
 /**
  * @param classes class names to combine
@@ -20,6 +23,12 @@ export const waitFor = (ms: number): Promise<void> => {
  */
 export const cC = (...classes: (string | undefined)[]): string => {
     return classes.filter(v => v).join(" ");
+};
+
+export const unbindEffects = (cancels: VoidFn[]): VoidFn => {
+    return () => {
+        cancels.forEach(c => c());
+    };
 };
 
 /**
@@ -30,13 +39,46 @@ export const cC = (...classes: (string | undefined)[]): string => {
  *
  * allows you to put an event listener in your useEffect without removing the function from the function call
  */
-export const effectEvent = <K extends keyof WindowEventMap>(type: K, listener: (ev: WindowEventMap[K]) => void, options?: boolean | AddEventListenerOptions | undefined, target?: any): () => void => {
+export const effectEvent = <K extends keyof WindowEventMap>(type: K, listener: (ev: WindowEventMap[K]) => void, options?: boolean | AddEventListenerOptions | undefined, target?: any): VoidFn => {
     if (!target)
         target = document;
     target.addEventListener(type, listener, options);
     return () => {
         target.removeEventListener(type, listener, options);
     };
+};
+
+export const useFramedEffectEvent = <K extends keyof WindowEventMap>(
+    type: K,
+    frameCallback: (ev: WindowEventMap[K]) => void,
+    deps: DependencyList,
+    initCallback?: (ev: WindowEventMap[K]) => void,
+    options?: boolean | AddEventListenerOptions | undefined,
+    target?: any | (() => any)
+) => {
+    const wasQueued = useRef(false);
+    const evRef = useRef<null | WindowEventMap[K]>(null);
+
+    useEffect(() => {
+        return effectEvent(type, (ev) => {
+            if(initCallback)
+                initCallback(ev);
+            evRef.current = ev;
+
+            if(!wasQueued.current) {
+                wasQueued.current = true;
+                requestAnimationFrame(() => {
+                    try{
+                        frameCallback(evRef.current!);
+                    } catch(e) {
+                        console.error(e);
+                    }
+                    wasQueued.current = false;
+                });
+            }
+
+        }, options, typeof target === "function" ? target() : target);
+    }, deps);
 };
 
 type Point = [number, number];

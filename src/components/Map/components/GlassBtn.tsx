@@ -1,5 +1,5 @@
 "use client";
-import { effectEvent } from "@/util";
+import { effectEvent, unbindEffects, VoidFn } from "@/util";
 import { FC, RefObject, useEffect, useRef } from "react";
 import styles from "./glassbtn.module.scss";
 
@@ -43,7 +43,7 @@ export type GlassHoverProps = {
     r?: RefObject<HTMLDivElement | null>
 };
 
-const GlassHover: FC<GlassHoverProps> = ({r}) => {
+const GlassHover: FC<GlassHoverProps> = ({r: _r}) => {
     const glassRef = useRef<HTMLDivElement>(null);
     const tR = useRef<any>(null);
     const stopUpdating = useRef(false);
@@ -68,7 +68,10 @@ const GlassHover: FC<GlassHoverProps> = ({r}) => {
         } else {
             if(isActive) {
                 gR.classList.remove(styles.active);
-                tR.current = setTimeout(() => {stopUpdating.current = true;}, 200);
+                tR.current = setTimeout(() => {
+                    gR.setAttribute("style", "top: 0; left: 0");
+                    stopUpdating.current = true;
+                }, 200);
             }
         }
 
@@ -90,8 +93,11 @@ const GlassHover: FC<GlassHoverProps> = ({r}) => {
     };
 
     useEffect(() => {
-        return effectEvent("mousemove", updatePos);
+        const cancels: VoidFn[] = [];
 
+        cancels.push(effectEvent("mousemove", updatePos));
+
+        return unbindEffects(cancels);
     }, []);
     return (
         <>
