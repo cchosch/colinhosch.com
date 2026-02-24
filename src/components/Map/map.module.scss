@@ -1,13 +1,14 @@
 
 .mapContainer {
-    position: absolute;
-    aspect-ratio: 747.33 / 550;
+    overflow: hidden;
 
     & > svg {
+        aspect-ratio: 747.33 / 550;
         position: absolute;
-        top: 0;
+        padding: 10px;
+        top: 50%;
+        transform: translateY(-50%);
         width: 100%;
-        height: 100%;
         overflow: visible;
     }
 }
@@ -26,7 +27,7 @@
         top: 50%;
         transform: translateY(-50%);
         width: calc(100% - 20px);
-        padding: 10px;
+        margin: 10px;
         overflow: visible;
     }
 }

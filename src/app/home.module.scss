@@ -17,12 +17,10 @@
     position: relative;
 }
 .map {
-    align-self: center;
-    margin: 10px;
-    width: calc(100% - 20px);
     position: absolute;
-    top: 50%;
-    transform:translateY(-50%);
+    width: 100%;
+    top: 0;
+    height: 100%;
 }
 
 .homeCont {
