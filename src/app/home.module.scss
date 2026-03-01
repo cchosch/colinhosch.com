@@ -1,8 +1,20 @@
+body:has(.homepage) {
+    background: radial-gradient(circle at top, #ffffff 0%, #eceef4 40%, #dfe3ed 100%);
+}
 
 .homepage {
     min-height: 100svh;
 
 }
+
+.worldBg {
+    position: absolute;
+    z-index: -1;
+    opacity: 0.5;              /* key: super low so it reads as texture */
+    filter: blur(0.3px); 
+    aspect-ratio: 16 / 9;
+}
+
 .china {
     height: 75vh;
     max-width: 100vw;
@@ -17,10 +29,9 @@
     position: relative;
 }
 .map {
-    position: absolute;
+    position: relative;
     width: 100%;
-    top: 0;
-    height: 100%;
+    height: calc(100%);
 }
 
 .homeCont {

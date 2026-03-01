@@ -14,7 +14,7 @@ type MapProps = {
     text?: string,
 };
 
-const [svgWidth, svgHeight] = [1380, 1000];
+const [svgWidth, svgHeight] = [1360, 1000];
 const Map: FC<MapProps> = ({className, includeCities: ic, text: txt}) => {
     const citiesContRef = useRef<SVGGElement>(null);
     const countriesGRef = useRef<SVGGElement>(null);
@@ -37,29 +37,33 @@ const Map: FC<MapProps> = ({className, includeCities: ic, text: txt}) => {
     const landColor = "#fbf8f2";
 
     const config = useMemo(() => {return {
-        start: [-500, -860] as [number, number],
-        end: [2300, 2050] as [number, number],
-        count: 45
+        // every 50 svg units
+        density: 50
     };}, []);
 
     return <>
         <div ref={gridContainerRef} className={styles.pContainer} >
-            <GridSvg parentRef={gridContainerRef} viewBoxWidth={svgWidth} viewBoxHeight={svgHeight} config={config} stroke="black" strokeWidth={1}/>
+            <GridSvg parentRef={gridContainerRef} viewBoxWidth={svgWidth} viewBoxHeight={svgHeight} config={config} stroke="#555" opacity={0.2} strokeWidth={1}/>
         </div>
 
 
         <div className={cC(styles.mapContainer, className)}>
-            <svg ref={svgRef} viewBox={`0 0 ${svgWidth} ${svgHeight}`}>
+            
+            <svg ref={svgRef} style={{opacity: 1}} viewBox={`0 0 ${svgWidth} ${svgHeight}`}>
 
 
                 <g ref={countriesGRef}  transform={initTransformString}>
+                    {/*}
                     <circle cx={0} cy={0} r="2" fill="red" />
                     <circle cx={680} cy={500} r="2" fill="red" />
+                    {*/}
 
                     <Country strokeWidth={1} stroke="black" name="kyrgyzstan" fill={landColor} />
-                    <Country strokeWidth={1} stroke="black" name="india" fill={landColor} />
-                    <Country strokeWidth={1} stroke="black" name="china" fill={landColor} />
+                    {/*<Country strokeWidth={1} stroke="black" name="india" fill={landColor} />*/}
                     <Country strokeWidth={1} stroke="black" name="kazakhstan" fill={landColor} />
+
+                    <Country strokeWidth={1} stroke="black" name="china" fill={landColor} />
+
 
                     {
                         txt && <text fontFamily="WeirdSerif" className="select-none" letterSpacing={0} color="red" x="41.5%" y="60%" fontSize={80} textAnchor="middle" fill="red" fontStyle="italic" fontWeight="600">
@@ -76,9 +80,9 @@ const Map: FC<MapProps> = ({className, includeCities: ic, text: txt}) => {
 
             </svg>
             {/*<ChinaSvg fill={landColor} stroke={landColor} strokeWidth="1" height="550px"/>*/}
+        <GlassHover/>
         </div>
 
-        {<GlassHover/>}
     </>;
 };
 

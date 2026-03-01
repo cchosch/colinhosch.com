@@ -3,7 +3,7 @@ import { Mutex } from "async-mutex";
 import { FC, SVGProps, useEffect, useState } from "react";
 
 
-type CountryName = "kyrgyzstan" | "china" | "kazakhstan" | "pakistan" | "india" | "nepal";
+type CountryName = "kyrgyzstan" | "china" | "kazakhstan" | "pakistan" | "india" | "nepal" | "world";
 
 let countriesMap: {[key in CountryName]: CountryPath} | null = null;
 const loading = new Mutex();
@@ -53,4 +53,4 @@ export const Country: FC<{name: CountryName} & SVGProps<SVGPathElement>> = (p) =
             return <path key={i} {...props} data-title={`${c.name}_${i}`} d={p} />;
         })}
     </g>;
-}
+};

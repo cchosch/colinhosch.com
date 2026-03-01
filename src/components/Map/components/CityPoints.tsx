@@ -1,7 +1,7 @@
 "use client";
 import { useFramedEffectEvent } from "@/util";
 import * as d3 from "d3-geo";
-import { FC, RefObject, SVGAttributes, useCallback, useMemo, useRef } from "react";
+import { FC, RefObject, SVGAttributes, useCallback, useMemo } from "react";
 import locations, { CityDetails } from "../../../util/cities";
 
 type CityPointsProps = {
@@ -14,14 +14,11 @@ const pointHoverTolerance = 400;
 const CityPoints: FC<SVGAttributes<SVGGElement> & CityPointsProps> = (props) => {
     const { screenToSvg, parentRef } = props;
 
-    const mousePosRef = useRef<{x: number, y: number} | null>(null);
-
     const projection =  useMemo(() => d3.geoMercator().center([103.1, 38.5]).scale(724.5).translate([pointWidth / 2, pointHeight / 2]), []);
 
     const updateCityPings = useCallback((ev: {clientX: number, clientY: number}) => {
         const citiesCont = parentRef.current;
-        const mousePos = mousePosRef.current;
-        if(!citiesCont || !mousePos)
+        if(!citiesCont)
             return;
 
         const cities = citiesCont.children;
@@ -48,7 +45,8 @@ const CityPoints: FC<SVGAttributes<SVGGElement> & CityPointsProps> = (props) => 
     useFramedEffectEvent(
         "mousemove",
         updateCityPings,
-    []);
+        []
+    );
 
     return <>
         {locArr.filter(([_l, {tier}]) => tier < 4).map(([loc, coords]) => {

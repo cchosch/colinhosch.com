@@ -1,5 +1,5 @@
 "use client";
-import { effectEvent, unbindEffects, VoidFn } from "@/util";
+import { unbindEffects, VoidFn } from "@/util";
 import { FC, RefObject, useEffect, useRef } from "react";
 import styles from "./glassbtn.module.scss";
 
@@ -95,7 +95,7 @@ const GlassHover: FC<GlassHoverProps> = ({r: _r}) => {
     useEffect(() => {
         const cancels: VoidFn[] = [];
 
-        cancels.push(effectEvent("mousemove", updatePos));
+        //cancels.push(effectEvent("mousemove", updatePos));
 
         return unbindEffects(cancels);
     }, []);
