@@ -8,7 +8,7 @@ export * from "@/util/AssetManager/assetManager";
 
 export type AssetStatus = "loading" | "error";
 
-export type AssetRecord<T extends AssetKind=AssetKind> = {
+export type AssetRecord<T extends AssetKind = AssetKind> = {
     url: string,
     m: Mutex,
 } & ({
@@ -104,12 +104,12 @@ async function loadAsset<T extends AssetKind>(
     const r1 = await rec.m.acquire();
 
     const current = assets[url] as AssetRecord<T> | undefined;
-    if(!current) {
+    if (!current) {
         console.error(`Asset "${url}" was removed while another instance was waiting on it...`);
         r1();
         return;
     }
-    if(current.status === "loaded") {
+    if (current.status === "loaded") {
         r1();
         return current.value;
     }
@@ -141,7 +141,7 @@ async function loadAsset<T extends AssetKind>(
             m: current.m
         };
     } finally {
-        if(newVal) {
+        if (newVal) {
             assets[url] = newVal;
             emit();
         }
@@ -159,7 +159,7 @@ export function useSubscribeAssets(listener: Listener) {
 }
 
 export async function loadEnvironment(
-  url: string
+    url: string
 ): Promise<THREE.DataTexture | undefined> {
     return await loadAsset<"environment">(
         url,
@@ -204,7 +204,7 @@ export function getAsset<T extends AssetDescriptor>(
     url: string
 ): LoadedType<T> {
     const asset = assets[url];
-    if(!asset || asset.status !== "loaded") {
+    if (!asset || asset.status !== "loaded") {
         throw new Error(`Asset "${url}" retreived before it was loaded`);
     }
 
@@ -216,8 +216,10 @@ export function useAssetsFinished(): boolean {
 
     useEffect(() => {
         return subscribeAssets((l) => {
-            if(l.loaded === l.total)
+            if (l.loaded === l.total)
                 setF(true);
+            else
+                setF(false);
         });
     }, []);
 

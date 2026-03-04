@@ -1,5 +1,5 @@
 "use client";
-import { unbindEffects, VoidFn } from "@/util";
+import { effectEvent, unbindEffects, VoidFn } from "@/util";
 import { FC, RefObject, useEffect, useRef } from "react";
 import styles from "./glassbtn.module.scss";
 
@@ -41,17 +41,17 @@ const ANIMATION_CONFIG = {
 
 export type GlassHoverProps = {
     r?: RefObject<HTMLDivElement | null>
-};
+} & React.HTMLAttributes<HTMLDivElement>;
 
-const GlassHover: FC<GlassHoverProps> = ({r: _r}) => {
+const GlassHover: FC<GlassHoverProps> = (props) => {
     const glassRef = useRef<HTMLDivElement>(null);
     const tR = useRef<any>(null);
     const stopUpdating = useRef(false);
 
-    const updatePos = ({clientX: x, clientY: y}: {clientX: number, clientY: number}) => {
+    const updatePos = ({ clientX: x, clientY: y }: { clientX: number, clientY: number }) => {
         const gR = glassRef.current;
         const citiesCont = gR?.parentElement;
-        if(!gR || !citiesCont)
+        if (!gR || !citiesCont)
             return;
 
         const offset = citiesCont.getBoundingClientRect();
@@ -59,14 +59,14 @@ const GlassHover: FC<GlassHoverProps> = ({r: _r}) => {
         x -= offset.x;
         y -= offset.y;
         const isActive = gR.classList.contains(styles.active);
-        if(x > 0 && x < offset.width && y > 0 && y < offset.height) {
-            if(!isActive) {
+        if (x > 0 && x < offset.width && y > 0 && y < offset.height) {
+            if (!isActive) {
                 gR.classList.add(styles.active);
                 clearInterval(tR.current);
                 stopUpdating.current = false;
             }
         } else {
-            if(isActive) {
+            if (isActive) {
                 gR.classList.remove(styles.active);
                 tR.current = setTimeout(() => {
                     gR.setAttribute("style", "top: 0; left: 0");
@@ -75,17 +75,17 @@ const GlassHover: FC<GlassHoverProps> = ({r: _r}) => {
             }
         }
 
-        if(stopUpdating.current)
+        if (stopUpdating.current)
             return;
 
 
         const gX = x - BTN_WIDTH / 2;
         const gY = y - BTN_WIDTH / 2;
-        if((gX + offset.x + BTN_WIDTH) >= document.body.scrollWidth) {
+        if ((gX + offset.x + BTN_WIDTH) >= document.body.scrollWidth) {
             return;
         }
 
-        if((gY + offset.y + BTN_HEIGHT) >= document.body.scrollHeight) {
+        if ((gY + offset.y + BTN_HEIGHT) >= document.body.scrollHeight) {
             return;
         }
 
@@ -95,17 +95,18 @@ const GlassHover: FC<GlassHoverProps> = ({r: _r}) => {
     useEffect(() => {
         const cancels: VoidFn[] = [];
 
-        //cancels.push(effectEvent("mousemove", updatePos));
+        cancels.push(effectEvent("mousemove", updatePos));
 
         return unbindEffects(cancels);
     }, []);
     return (
         <>
             <div ref={glassRef} className={`relative  w-full ${styles.btnCont}`}
+                {...props}
                 style={{
                     maxWidth: `${BTN_WIDTH}px`,
-                    minHeight: `${BTN_HEIGHT}px`,
-                    borderRadius: `${(BTN_WIDTH / 2).toFixed(0)}px`,
+                    aspectRatio: `${BTN_WIDTH} / ${BTN_HEIGHT}`,
+                    borderRadius: `${(BTN_HEIGHT / 2).toFixed(0)}px`,
                 }}>
 
                 {/* filters */}
@@ -120,62 +121,66 @@ const GlassHover: FC<GlassHoverProps> = ({r: _r}) => {
                 }}>
                 </div>
             </div>
-            <svg colorInterpolationFilters="sRGB" style={{ display: "none" }}>
-                <defs>
-                    <filter id="liquid-glass-button">
-                        <feGaussianBlur
-                            in="SourceGraphic"
-                            stdDeviation={ANIMATION_CONFIG.initial.blur}
-                            result="blurred_source"
-                        />
-                        <feImage
-                            href={DISPLACEMENT_MAP_URI}
-                            x="0"
-                            y="0"
-                            width={BTN_WIDTH}
-                            height={BTN_HEIGHT}
-                            result="displacement_map"
-                        ></feImage>
-                        <feDisplacementMap
-                            in="blurred_source"
-                            in2="displacement_map"
-                            scale={ANIMATION_CONFIG.initial.displacement}
-                            xChannelSelector="R"
-                            yChannelSelector="G"
-                            result="displaced"
-                        />
-                        <feColorMatrix in="displaced"
-                            type="saturate"
-                            result="displaced_saturated"
-                            values="150" />
-
-                        <feImage
-                            href={SPECULAR_LIGHTING_URI}
-                            x="0"
-                            y="0"
-                            width={BTN_WIDTH}
-                            height={BTN_HEIGHT}
-                            result="specular_layer"
-                        />
-                        <feGaussianBlur
-                            in="specular_layer"
-                            stdDeviation="1"
-                            result="blurred_specular_layer"
-                        />
-                        <feComposite
-                            in="displaced_saturated"
-                            in2="blurred_specular_layer"
-                            operator="in"
-                            result="final_specular_layer"
-                        />
-
-                        <feBlend in="final_specular_layer" in2="displaced" mode="normal"/>
-                    </filter>
-                </defs>
-            </svg>
         </>
     );
 };
+
+export const GlassBtnDefs = () => {
+    return <svg colorInterpolationFilters="sRGB" style={{ display: "none" }}>
+        <defs>
+            <filter id="liquid-glass-button">
+                <feGaussianBlur
+                    in="SourceGraphic"
+                    stdDeviation={ANIMATION_CONFIG.initial.blur}
+                    result="blurred_source"
+                />
+                <feImage
+                    href={DISPLACEMENT_MAP_URI}
+                    x="0"
+                    y="0"
+                    width={BTN_WIDTH}
+                    height={BTN_HEIGHT}
+                    result="displacement_map"
+                ></feImage>
+                <feDisplacementMap
+                    in="blurred_source"
+                    in2="displacement_map"
+                    scale={ANIMATION_CONFIG.initial.displacement}
+                    xChannelSelector="R"
+                    yChannelSelector="G"
+                    result="displaced"
+                />
+                <feColorMatrix in="displaced"
+                    type="saturate"
+                    result="displaced_saturated"
+                    values="150" />
+
+                <feImage
+                    href={SPECULAR_LIGHTING_URI}
+                    x="0"
+                    y="0"
+                    width={BTN_WIDTH}
+                    height={BTN_HEIGHT}
+                    result="specular_layer"
+                />
+                <feGaussianBlur
+                    in="specular_layer"
+                    stdDeviation="1"
+                    result="blurred_specular_layer"
+                />
+                <feComposite
+                    in="displaced_saturated"
+                    in2="blurred_specular_layer"
+                    operator="in"
+                    result="final_specular_layer"
+                />
+
+                <feBlend in="final_specular_layer" in2="displaced" mode="normal" />
+            </filter>
+        </defs>
+    </svg>;
+};
+
 
 
 export default GlassHover;

@@ -7,7 +7,7 @@ export type LoadWait = {
 const assetRegistry: string[] = [];
 
 export function registerAsset(url: string) {
-    if(assetRegistry.includes(url))
+    if (assetRegistry.includes(url))
         return;
 
     assetRegistry.push(url);
@@ -24,7 +24,7 @@ export type LoadWaitEvent = {
     status: "init" | "done"
 };
 
-export function bindLoadWait(name: string, unique: boolean=true): () => void {
+export function bindLoadWait(name: string, unique: boolean = true): () => void {
     const id = Math.floor(Math.random() * 16777215).toString(16);
     window.postMessage({
         loadEvent: {

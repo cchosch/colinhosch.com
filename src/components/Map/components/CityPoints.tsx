@@ -7,12 +7,13 @@ import locations, { CityDetails } from "../../../util/cities";
 type CityPointsProps = {
     screenToSvg: (clientX: number, clientY: number) => {x: number, y: number},
     parentRef: RefObject<SVGElement | null>,
+    activeCities: {id: string, lat: number, lon: number, tier: number, name: string}[]
 }
 
 const [pointWidth, pointHeight] = [747, 550];
 const pointHoverTolerance = 400;
 const CityPoints: FC<SVGAttributes<SVGGElement> & CityPointsProps> = (props) => {
-    const { screenToSvg, parentRef } = props;
+    const { screenToSvg, parentRef, activeCities } = props;
 
     const projection =  useMemo(() => d3.geoMercator().center([103.1, 38.5]).scale(724.5).translate([pointWidth / 2, pointHeight / 2]), []);
 
@@ -41,6 +42,8 @@ const CityPoints: FC<SVGAttributes<SVGGElement> & CityPointsProps> = (props) => 
             ];
         });
     }).flat(), []);
+    /*
+    */
 
     useFramedEffectEvent(
         "mousemove",
@@ -49,6 +52,13 @@ const CityPoints: FC<SVGAttributes<SVGGElement> & CityPointsProps> = (props) => 
     );
 
     return <>
+        {activeCities.filter(c => c.tier < 4).map(({lat, lon, name}) => {
+            const [x, y] = projection([lon, lat])!;
+            const tX = x;
+            const tY = y;
+
+            return <circle cy={tY.toFixed(4)} cx={tX.toFixed(4)} data-location={name} key={name} r="2" fill="red" />;
+        })}
         {locArr.filter(([_l, {tier}]) => tier < 4).map(([loc, coords]) => {
             const [x, y] = projection([coords.lon, coords.lat])!;
             const tX = x;

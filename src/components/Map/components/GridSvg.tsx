@@ -6,18 +6,18 @@ type GridSvgProps = {
     config: {
         density: number,
     },
-    screenToSvg?: (x: number, y: number) => {x: number, y: number};
+    screenToSvg?: (x: number, y: number) => { x: number, y: number };
     parentRef: RefObject<HTMLDivElement | null>
 } & SVGAttributes<SVGPathElement>;
 
 const decimalAccuracy = 4;
 const [width, height] = [1360, 1000];
-const GridSvg: FC<GridSvgProps> = ({parentRef, config, opacity, strokeWidth, stroke}) => {
+const GridSvg: FC<GridSvgProps> = ({ parentRef, config, opacity, strokeWidth, stroke }) => {
     const [viewBoxWidth, viewBoxHeight] = [width, height];
-    const countRef = useRef<null | {x: number, y: number}>(null);
+    const countRef = useRef<null | { x: number, y: number }>(null);
 
     const gridSpace = config.density;
-    const [center, setCenter] = useState<[number, number]>([0, 0]);
+    const [, setCenter] = useState<[number, number]>([0, 0]);
     const [path, setPath] = useState("");
 
     const updatePath = () => {
@@ -47,7 +47,7 @@ const GridSvg: FC<GridSvgProps> = ({parentRef, config, opacity, strokeWidth, str
         const countY = Math.floor(innerHeight / gridSpace) + 3;
 
         const oldCount = countRef.current;
-        if(oldCount && countX === oldCount.x && countY === oldCount.y)
+        if (oldCount && countX === oldCount.x && countY === oldCount.y)
             return;
 
         countRef.current = {
@@ -72,12 +72,12 @@ const GridSvg: FC<GridSvgProps> = ({parentRef, config, opacity, strokeWidth, str
 
         const ps = [];
         for (let i = 0; i < countY; i++) {
-            const y = (startY + (i * gridSpace) ).toFixed(decimalAccuracy);
+            const y = (startY + (i * gridSpace)).toFixed(decimalAccuracy);
             ps.push(`M${startX.toFixed(decimalAccuracy)},${y} ${endX.toFixed(decimalAccuracy)},${y}`);
         }
 
         for (let i = 0; i < countX; i++) {
-            const x = (startX + (i * gridSpace)   ).toFixed(decimalAccuracy);
+            const x = (startX + (i * gridSpace)).toFixed(decimalAccuracy);
             ps.push(`M${x},${startY.toFixed(decimalAccuracy)} ${x},${endY.toFixed(decimalAccuracy)}`);
         }
 
@@ -88,12 +88,12 @@ const GridSvg: FC<GridSvgProps> = ({parentRef, config, opacity, strokeWidth, str
         updatePath();
 
         const parent = parentRef.current;
-        if(!parent)
+        if (!parent)
             return;
 
         let frameId: number | null = null;
         const ro = new ResizeObserver((_e) => {
-            if(frameId !== null) {
+            if (frameId !== null) {
                 return;
             }
             frameId = requestAnimationFrame(() => {
@@ -107,8 +107,8 @@ const GridSvg: FC<GridSvgProps> = ({parentRef, config, opacity, strokeWidth, str
     }, []);
 
     return <svg viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}>
-        <path opacity={opacity} fill="none" strokeWidth={strokeWidth} stroke={stroke} d={path}/>;
-        <circle r={4} fill="red" cx={center[0]} cy={center[1]}/>
+        <path opacity={opacity} fill="none" strokeWidth={strokeWidth} stroke={stroke} d={path} />;
+        {/*<circle r={4} fill="red" cx={center[0]} cy={center[1]}/>*/}
     </svg>;
 };
 

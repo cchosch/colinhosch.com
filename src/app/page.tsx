@@ -1,12 +1,16 @@
 import Map from "@/components/Map";
 import Nav from "@/components/Nav";
 import { Country } from "@/util/countries";
-import LensScene from "./_LensScene";
 import styles from "./home.module.scss";
+import ItemScene from "./_ItemScene/ItemScene";
+import "@/util/AssetManager";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default async function Home() {
 
-    return (<div className={styles.homepage}>
+    return (<>
+        {<LoadingScreen/>}
+        <div className={styles.homepage}>
         <svg
             aria-hidden="true"
             className={styles.worldBg}
@@ -36,16 +40,21 @@ export default async function Home() {
         <div className={styles.homeCont}>
             <div className={styles.bio}>
                 <img width="500" height={300} alt="meme" src="/headshot.png" />
-                <div className="w-full">
-                    <div className="font-mono text-3xl text-center w-full font-bold">Gear</div>
-                    <LensScene style={{width: "275px", height: "300px", overflow: "visible"}} />
+
+                <div className="mb-2 mt-6 font-mono text-3xl text-center w-full font-bold">Items</div>
+
+                <div className={styles.itemsContainer}>
+                    <ItemScene item="lens" className={styles.itemCanvas}/>
+                    <ItemScene item="camera" className={styles.itemCanvas}/>
+                    <ItemScene item="computer" className={styles.itemCanvas}/>
                 </div>
             </div>
             <div >
-                <Map className={styles.map} />
+                <Map activeCities={[{name: "Beijing", "lat": 40.190632, "lon": 116.412144, tier: 1, id: "bj"}]} className={styles.map} />
             </div>
         </div>
-    </div>);
+    </div>
+    </>);
 }
 
 

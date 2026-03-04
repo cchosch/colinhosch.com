@@ -3,16 +3,16 @@ import { RefObject, useCallback, useEffect, useRef } from "react";
 
 type useTransformReturn = {
     initTransformString: string,
-    screenToSvg: (clientX: number, clientY: number) => {x: number, y: number}
+    screenToSvg: (clientX: number, clientY: number) => { x: number, y: number }
 };
 
 // left = 0
 // middle = 1
 const dragButton: MouseEvent["button"] = 0;
-const useTransform = (svgRef: RefObject<SVGElement | null>, svgWidth: number, svgHeight: number, onUpdate: (transString: string) => void): useTransformReturn => {
+const useTransform = (svgRef: RefObject<SVGElement | null>, svgWidth: number, svgHeight: number, moveEnabled: boolean, onUpdate: (transString: string) => void): useTransformReturn => {
     const parentRectRef = useRef<DOMRect | null>(null);
     const scale = useRef(1.791907);
-    const translate = useRef<{x: number, y: number}>({
+    const translate = useRef<{ x: number, y: number }>({
         x: -16.731383773391954,
         y: 61.25564161599507
     });
@@ -21,35 +21,39 @@ const useTransform = (svgRef: RefObject<SVGElement | null>, svgWidth: number, sv
         return `translate(${translate.current.x.toFixed(4)} ${translate.current.y.toFixed(4)}) scale(${scale.current.toFixed(4)})`;
     };
 
-    const changeTransform = useCallback((transl?: {x: number, y: number}, scl?: number) => {
-        if(transl)
+    const changeTransform = useCallback((transl?: { x: number, y: number }, scl?: number) => {
+        if (!moveEnabled)
+            return;
+        if (transl)
             translate.current = transl;
-        if(scl)
+        if (scl)
             scale.current = scl;
         console.log(translate.current);
         console.log(scale.current);
 
-        const t =  getTransformString();
+        const t = getTransformString();
         onUpdate(t);
-    }, []);
+    }, [moveEnabled]);
 
 
-    const screenToSvg = useCallback((clientX: number, clientY: number): {x: number, y: number} => {
+    const screenToSvg = useCallback((clientX: number, clientY: number): { x: number, y: number } => {
         const offset = parentRectRef.current;
-        if(!offset)
+        if (!offset)
             throw new Error("No parent rect");
 
-        const x = svgWidth * (clientX - offset.x) / offset.width;
-        const y = svgHeight * (clientY - offset.y) / offset.height;
+        const x = svgWidth * (clientX - offset.left) / offset.width;
+        const y = svgHeight * (clientY - offset.top) / offset.height;
         return {
-            x: (x - translate.current.x ) / scale.current,
-            y: (y - translate.current.y ) / scale.current
+            x: (x - translate.current.x) / scale.current,
+            y: (y - translate.current.y) / scale.current
         };
     }, []);
 
     useFramedEffectEvent(
         "wheel",
         (ev) => {
+            if (!moveEnabled)
+                return;
             const zoomScale = Math.max(Math.min(1 - ev.deltaY / 2000, 2), 0.1);  // >1 in, <1 out
 
             const oldScale = scale.current;
@@ -69,8 +73,11 @@ const useTransform = (svgRef: RefObject<SVGElement | null>, svgWidth: number, sv
 
             changeTransform(newTranslate, newScale);
         },
-        [],
-        (ev) => ev.preventDefault(),
+        [moveEnabled],
+        (ev) => {
+            if (moveEnabled)
+                ev.preventDefault()
+        },
         undefined,
         () => svgRef.current!.parentElement!.parentElement
     );
@@ -81,36 +88,50 @@ const useTransform = (svgRef: RefObject<SVGElement | null>, svgWidth: number, sv
         const parent = svgRef.current;
 
         if (parent) {
+            let updateTimeout: null | any = null;
+            es.push(() => {
+                if (updateTimeout)
+                    clearTimeout(updateTimeout)
+            });
             const updateRect = () => {
-                parentRectRef.current = parent.getBoundingClientRect();
+                if (updateTimeout)
+                    clearTimeout(updateTimeout)
+
+                if (!parentRectRef.current)
+                    parentRectRef.current = parent.getBoundingClientRect();
+
+                updateTimeout = setTimeout(() => {
+                    parentRectRef.current = parent.getBoundingClientRect();
+                }, 50);
             };
 
             updateRect();
             const ro = new ResizeObserver(updateRect);
+            ro.observe(document.body);
             ro.observe(parent);
 
             es.push(() => ro.disconnect());
-            const unbindDrag: {current: null | VoidFn} = {current: null};
+            const unbindDrag: { current: null | VoidFn } = { current: null };
             es.push(() => {
-                if(unbindDrag.current) {
+                if (unbindDrag.current) {
                     unbindDrag.current();
                     unbindDrag.current = null;
                 }
             });
             const mouseUp = (ev: MouseEvent) => {
-                if(ev.button !== dragButton)
+                if (ev.button !== dragButton)
                     return;
-                if(unbindDrag.current) {
+                if (unbindDrag.current) {
                     unbindDrag.current();
                     unbindDrag.current = null;
                 }
             };
 
             es.push(effectEvent("mousedown", (downEv) => {
-                if(downEv.button !== dragButton)
+                if (downEv.button !== dragButton)
                     return;
 
-                if(unbindDrag.current) {
+                if (unbindDrag.current) {
                     unbindDrag.current();
                     unbindDrag.current = null;
                 }

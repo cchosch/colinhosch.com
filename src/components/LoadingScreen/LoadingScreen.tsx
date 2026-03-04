@@ -37,12 +37,12 @@ const LoadingScreen = () => {
     const addLoadingBlock = (id: string) => {
         console.debug(`Add: ${id}`);
         setWaitingFor(wf => {
-            if(wf.includes(id))
+            if (wf.includes(id))
                 return wf;
             return [...wf, id];
         });
 
-        if(!fb.current) {
+        if (!fb.current) {
             fb.current = true;
         }
     };
@@ -54,8 +54,8 @@ const LoadingScreen = () => {
     const removeLoadingBlock = (id: string) => {
         console.debug(`Remove: ${id}`);
         setWaitingFor((wF) => {
-            for(let i = 0; i < wF.length; i++) {
-                if(wF[i] === id) {
+            for (let i = 0; i < wF.length; i++) {
+                if (wF[i] === id) {
                     wF = wF.filter((_, j) => i !== j);
                     break;
                 }
@@ -64,12 +64,9 @@ const LoadingScreen = () => {
         });
     };
 
-    useEffect(() => {
-        if(waitingFor.length === 0 && fb.current && !disabled)
-            loadingScreen.current?.classList.remove(styles.active);
-    }, [waitingFor]);
 
     useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "instant" })
         document.fonts.ready.finally(() => {
             removeLoadingBlock("fonts");
         });
@@ -79,11 +76,12 @@ const LoadingScreen = () => {
             if (!loadEvent) return;
 
             let id = `${loadEvent.id}:${loadEvent.name}`;
-            if(!loadEvent.unique)
+            if (!loadEvent.unique)
                 id = id.split(":")[1];
 
-            switch(loadEvent.status) {
+            switch (loadEvent.status) {
                 case LoadingEvents.INIT_WAIT:
+                    console.log("recv add");
                     addLoadingBlock(id);
                     break;
                 case LoadingEvents.FINISH_WAIT:
@@ -92,25 +90,32 @@ const LoadingScreen = () => {
         }, undefined, window);
     }, []);
 
-    const percentage = useMemo(() => pb?.percentage??0, [pb]);
+    const percentage = useMemo(() => pb?.percentage ?? 0, [pb]);
 
     const currStage = useMemo(() => {
-        if(haveLoadingBlock("fonts"))
+        if (haveLoadingBlock("fonts"))
             return 1;
-        if(percentage !== 100)
+        if (percentage !== 100)
             return 2;
-        if(haveLoadingBlock("first_frame"))
+        if (haveLoadingBlock("first_frame") || waitingFor.length !== 0)
             return 3;
+        console.log(waitingFor.length);
         return 4;
-    }, [haveLoadingBlock, percentage]);
+    }, [haveLoadingBlock, percentage, waitingFor]);
     const maxStage = 4;
 
     useEffect(() => {
+        if (currStage === maxStage && !disabled) {
+            loadingScreen.current?.classList.remove(styles.active);
+        }
+    }, [currStage]);
+
+    useEffect(() => {
         const statCont = statusRef.current;
-        if(!statCont)
+        if (!statCont)
             return;
 
-        const p = Math.min(currStage - 1, maxStage-2) / (maxStage-2);
+        const p = Math.min(currStage - 1, maxStage - 2) / (maxStage - 2);
         statCont.setAttribute("style", `--loading-height: calc(${(p * 100).toFixed(2)}% - ${(p * 0.8).toFixed(3)}rem)`);
 
     }, [currStage]);
@@ -129,8 +134,8 @@ const LoadingScreen = () => {
                 </div>
                 <div className={cC(styles.progBarCont, styles.loadCheck, currStage >= 3 ? styles.success : "")}>
                     <Check />
-                    <div>Assets {pb?.loaded??0}/{pb?.total??'?'} ({percentage.toFixed().padStart(3, "_")}%)</div>
-                    <div style={{"--loaded": `${percentage.toFixed(3)}%`} as any} className={styles.progBar}/>
+                    <div>Assets {pb?.loaded ?? 0}/{pb?.total ?? '?'} ({percentage.toFixed().padStart(3, "_")}%)</div>
+                    <div style={{ "--loaded": `${percentage.toFixed(3)}%` } as any} className={styles.progBar} />
                 </div>
                 <div className={cC(styles.loadCheck, currStage >= 4 ? styles.success : "")}>
                     <Check />
