@@ -101,7 +101,7 @@ const GlassHover: FC<GlassHoverProps> = (props) => {
     }, []);
     return (
         <>
-            <div ref={glassRef} className={`relative  w-full ${styles.btnCont}`}
+            <div ref={glassRef} className={`relative z-10 w-full ${styles.btnCont}`}
                 {...props}
                 style={{
                     maxWidth: `${BTN_WIDTH}px`,

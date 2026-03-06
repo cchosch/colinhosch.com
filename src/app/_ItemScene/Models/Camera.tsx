@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import * as THREE from "three";
 import { useRotateGroup } from "@/app/_ItemScene/Models/animations";
@@ -15,11 +15,14 @@ const CameraModel = () => {
     const assets = getAssets(cameraAssets);
     const cameraGroupR = useRef<THREE.Group>(null);
 
-    useRotateGroup(cameraGroupR);
+    useRotateGroup(cameraGroupR, {
+        initRotate: {
+        }
+    });
 
     return <>
         <group position={[0, 0.5, 0]} ref={cameraGroupR} scale={0.25}>
-            <primitive object={assets.model.scene}/>
+            <primitive rotation={[-Math.PI / 16, 0, 0]} object={assets.model.scene} />
         </group>
     </>;
 };

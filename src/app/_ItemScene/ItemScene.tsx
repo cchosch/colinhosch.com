@@ -1,5 +1,5 @@
-"use client"
-import * as THREE from "three"
+"use client";
+import * as THREE from "three";
 import Environment from "@/components/Environment";
 import { loadAllAssets, useAssetsFinished } from "@/util/AssetManager";
 import { OrbitControls, OrthographicCamera, PerspectiveCamera } from "@react-three/drei";
@@ -14,6 +14,7 @@ const ItemScene: FC<CanvasProps & { item: "lens" | "camera" | "computer" }> = (p
     const ortho = false;
     const orbital = false;
 
+    const canvasRef = useRef<HTMLCanvasElement>(null);
     const setTargetFocalLengthRef = useRef((_l: number) => { });
     const leave = () => setTargetFocalLengthRef.current(17);
     const enter = () => setTargetFocalLengthRef.current(70);
@@ -36,6 +37,7 @@ const ItemScene: FC<CanvasProps & { item: "lens" | "camera" | "computer" }> = (p
         return <div style={p.style} className={p.className}></div>;
 
     return <div style={p.style} className={p.className}>
+        {p.item === "computer" && <canvas ref={canvasRef} style={{ display: "none", position: "fixed", aspectRatio: "3074/1981", height: "40svh", top: "0", left: "0" }}></canvas>}
         <Canvas  {...p} style={undefined} className={undefined} >
             {!ortho && <PerspectiveCamera makeDefault position={[10, 0.75, 0]} fov={23.5} />}
             {ortho && <OrthographicCamera makeDefault position={[10, 0.9, 0]} scale={0.005} />}
@@ -54,7 +56,7 @@ const ItemScene: FC<CanvasProps & { item: "lens" | "camera" | "computer" }> = (p
                     case "camera":
                         return <CameraModel />;
                     case "computer":
-                        return <LaptopModel />;
+                        return <LaptopModel canvasRef={canvasRef} />;
                 }
                 return <></>;
             })()}

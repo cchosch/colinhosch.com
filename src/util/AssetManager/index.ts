@@ -1,3 +1,3 @@
-export * from "./assetLoader";
+export * from "./assetLoader.client";
 export * from "./assetManager";
 

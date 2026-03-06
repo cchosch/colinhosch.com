@@ -31,6 +31,9 @@ export default function RootLayout({
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             </head>
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} >
+                <div className="fixed text-xs bottom-0 right-0 z-20 bg-slate-200 rounded-tl-xl px-2 py-1">
+                    This website was NOT vibecoded ;)
+                </div>
                 <GlassBtnDefs />
                 <LoadAssets />
                 {/*<Cursor/>*/}

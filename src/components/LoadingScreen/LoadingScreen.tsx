@@ -1,7 +1,7 @@
 "use client";
 import Check from "@/Icon/Check";
 import { cC, effectEvent } from "@/util";
-import { useSubscribeAssets } from "@/util/AssetManager/assetLoader";
+import { useSubscribeAssets } from "@/util/AssetManager/assetLoader.client";
 import { type LoadWaitEvent } from "@/util/loadingState";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./loadingscreen.module.scss";
@@ -66,7 +66,7 @@ const LoadingScreen = () => {
 
 
     useEffect(() => {
-        window.scrollTo({ top: 0, behavior: "instant" })
+        window.scrollTo({ top: 0, behavior: "instant" });
         document.fonts.ready.finally(() => {
             removeLoadingBlock("fonts");
         });

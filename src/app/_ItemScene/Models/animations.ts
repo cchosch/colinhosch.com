@@ -1,25 +1,29 @@
 import { cubicInterpolate } from "@/util";
 import { useFrame } from "@react-three/fiber";
-import { RefObject, useEffect, useRef } from "react";
+import { RefObject, useRef } from "react";
 import * as THREE from "three";
 
-export const fixedRefF = <T>(func: (arg: T) => void | (() => void), ...a: any[]): ((a: RefObject<T | null>) => void | (() => void)) => {
+export const fixedRefF = <T>(func: (arg: T) => void | (() => void)): ((a: RefObject<T | null>) => void | (() => void)) => {
     return (argR) => {
         const arg = argR.current;
-        if(!arg)
-            return () => {};
+        if (!arg)
+            return () => { };
 
         const cb = func(arg);
 
-        if(cb)
+        if (cb)
             return () => {
                 cb();
             };
-    }
-}
+    };
+};
 
 export type RotateGroupOptions = {
-    initZRotate?: number
+    initRotate?: {
+        z?: number,
+        x?: number,
+
+    }
 };
 
 export const useRotateGroup = (gR: RefObject<THREE.Group | null>, options?: RotateGroupOptions) => {
@@ -27,14 +31,15 @@ export const useRotateGroup = (gR: RefObject<THREE.Group | null>, options?: Rota
 
     useFrame(() => {
         const g = gR.current;
-        if(!g)
+        if (!g)
             return;
 
-        if(!fRef.current) {
+        if (!fRef.current) {
             fRef.current = true;
 
             g.rotation.y = Math.random() * Math.PI * 2;
-            g.rotation.z = options?.initZRotate ?? (Math.PI / 8);
+            g.rotation.z = options?.initRotate?.z ?? (Math.PI / 8);
+            g.rotation.x = options?.initRotate?.x ?? 0;
         }
 
         g.rotation.y = (g.rotation.y + 0.003) % (Math.PI * 2);
@@ -44,69 +49,69 @@ export const useRotateGroup = (gR: RefObject<THREE.Group | null>, options?: Rota
 
 type GroupRef = RefObject<THREE.Group | null>
 export const zoomOnHover = (zoomRingRef: GroupRef, zoomBarrelRef: GroupRef, targetFocalLength: RefObject<number>, startHoverTime: RefObject<number>) => {
-        const zoomRing = zoomRingRef.current;
-        const zoomBarrel = zoomBarrelRef.current;
+    const zoomRing = zoomRingRef.current;
+    const zoomBarrel = zoomBarrelRef.current;
 
-        if(!zoomRing || !zoomBarrel)
-            return;
+    if (!zoomRing || !zoomBarrel)
+        return;
 
 
-        const interpFocalLength: [number, number][] = [
-            [17, 0],
-            [24, 0.185],
-            [35, 0.40],
-            [50, 0.595],
-            [70, 0.715],
-        ];
+    const interpFocalLength: [number, number][] = [
+        [17, 0],
+        [24, 0.185],
+        [35, 0.40],
+        [50, 0.595],
+        [70, 0.715],
+    ];
 
-        const targetRot = cubicInterpolate(interpFocalLength, targetFocalLength.current);
+    const targetRot = cubicInterpolate(interpFocalLength, targetFocalLength.current);
 
-        if(targetRot === zoomRing.rotation.y) {
-            if(startHoverTime.current > 0) {
-                console.log(new Date().getTime()-startHoverTime.current);
-                startHoverTime.current = 0;
-            }
-            return;
+    if (targetRot === zoomRing.rotation.y) {
+        if (startHoverTime.current > 0) {
+            console.log(new Date().getTime() - startHoverTime.current);
+            startHoverTime.current = 0;
         }
+        return;
+    }
 
-        let minRot = targetRot;
-        let maxRot = targetRot;
-        let rotationDir = 1;
-        if(targetRot > zoomRing.rotation.y) {
-            minRot = 0;
-            maxRot = targetRot;
-        } if(targetRot < zoomRing.rotation.y) {
-            rotationDir = -1;
-            minRot = targetRot;
-            maxRot = 0.715;
-        }
-        // rough speed in milliseconds, does change based on render because delta sucks
-        const speedMs = 300;
+    let minRot = targetRot;
+    let maxRot = targetRot;
+    let rotationDir = 1;
+    if (targetRot > zoomRing.rotation.y) {
+        minRot = 0;
+        maxRot = targetRot;
+    } if (targetRot < zoomRing.rotation.y) {
+        rotationDir = -1;
+        minRot = targetRot;
+        maxRot = 0.715;
+    }
+    // rough speed in milliseconds, does change based on render because delta sucks
+    const speedMs = 300;
 
-        zoomRing.rotation.y += (0.005 * rotationDir) / (speedMs / 1000) ;
-        zoomRing.rotation.y = Math.max(Math.min(zoomRing.rotation.y, maxRot), minRot);
+    zoomRing.rotation.y += (0.005 * rotationDir) / (speedMs / 1000);
+    zoomRing.rotation.y = Math.max(Math.min(zoomRing.rotation.y, maxRot), minRot);
 
-        /*
-        if(zoomRing.rotation.y > 0.715 || zoomRing.rotation.y < 0)
-            rotationDir.current *= -1;
-        */
+    /*
+    if(zoomRing.rotation.y > 0.715 || zoomRing.rotation.y < 0)
+        rotationDir.current *= -1;
+    */
 
-        // 17 = 0
-        // 24 = 0.185
-        // 35 = 0.40
-        // 50 = 0.59
-        // 70 = 0.715
+    // 17 = 0
+    // 24 = 0.185
+    // 35 = 0.40
+    // 50 = 0.59
+    // 70 = 0.715
 
-        // ABS MAX = 0.63635
+    // ABS MAX = 0.63635
 
 
-        const interpolateZoom: [number, number][] = [
-            [0, 0], // 17mm
-            [0.185, 0.05], // 24mm
-            [0.40, 0.15], // 35mm
-            [0.59, 0.35], // 50mm
-            [0.715, 0.63635], // 70mm
-        ];
+    const interpolateZoom: [number, number][] = [
+        [0, 0], // 17mm
+        [0.185, 0.05], // 24mm
+        [0.40, 0.15], // 35mm
+        [0.59, 0.35], // 50mm
+        [0.715, 0.63635], // 70mm
+    ];
 
-        zoomBarrel.position.y = cubicInterpolate(interpolateZoom, zoomRing.rotation.y) * 0.04;
-}
+    zoomBarrel.position.y = cubicInterpolate(interpolateZoom, zoomRing.rotation.y) * 0.04;
+};

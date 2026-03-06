@@ -1,8 +1,5 @@
 import * as THREE from "three";
 
-function x() {
-    let x = [[[]]];
-}
 export type RenderState = {
     readIndex: [number, number],
     contentTexture: THREE.CanvasTexture,

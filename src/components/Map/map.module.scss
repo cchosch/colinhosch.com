@@ -1,8 +1,7 @@
-
 .mapContainer {
     overflow: hidden;
 
-    & > svg {
+    &>svg {
         aspect-ratio: 747.33 / 550;
         position: absolute;
         padding: 10px;
@@ -13,6 +12,45 @@
     }
 }
 
+.comingSoon {
+    font-size: 6rem;
+    font-weight: bold;
+    font-family: 'WeirdSerif', serif;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
+
+    /* Inverts black to reveal background */
+    mix-blend-mode: difference;
+
+}
+
+@media (max-width: 400px) {
+    .comingSoon {
+        font-size: 5rem;
+    }
+}
+
+
+.comingContainer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(2px);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    isolation: isolate;
+    /* Creates new stacking context */
+    mix-blend-mode: multiply;
+    /* Black overlay effect */
+}
+
 .pContainer {
     position: absolute;
     width: calc(100%);
@@ -21,7 +59,7 @@
     border-radius: 20px;
     background-color: #d5e7f3;
 
-    & > svg {
+    &>svg {
         aspect-ratio: 747.33 / 550;
         position: absolute;
         top: 50%;

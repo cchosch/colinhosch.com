@@ -9,18 +9,18 @@ type CacheData = {
     is_up_to_date: boolean,
     percent_calculated: number,
     range: {
-      start: string, // '2023-02-12T05:00:00Z'
-      start_date: string, // '2023-02-12'
-      start_text: string, // 'Sun Feb 12th 2023'
-      end: string, // '2025-03-05T04:59:59Z'
-      end_date: string, // '2025-03-04'
-      end_text: string, // 'Today'
-      timezone: string // 'America/New_York'
+        start: string, // '2023-02-12T05:00:00Z'
+        start_date: string, // '2023-02-12'
+        start_text: string, // 'Sun Feb 12th 2023'
+        end: string, // '2025-03-05T04:59:59Z'
+        end_date: string, // '2025-03-04'
+        end_text: string, // 'Today'
+        timezone: string // 'America/New_York'
     },
     timeout: number
 }
 
-const wakaCache: {data: CacheData | null, lastFetched: number | null} = {
+const wakaCache: { data: CacheData | null, lastFetched: number | null } = {
     data: null,
     lastFetched: null
 };
@@ -30,7 +30,7 @@ const CACHE_DURATION = 1000 * 60 * 60;
 export async function fetchWakaTimeHours(): Promise<CacheData | null> {
     const now = Date.now();
 
-    if(wakaCache.data && wakaCache.lastFetched && now - wakaCache.lastFetched < CACHE_DURATION) {
+    if (wakaCache.data && wakaCache.lastFetched && now - wakaCache.lastFetched < CACHE_DURATION) {
         return wakaCache.data;
     }
     const resp = await fetch(
@@ -43,9 +43,9 @@ export async function fetchWakaTimeHours(): Promise<CacheData | null> {
     );
 
     const jsonResponse = (await resp.json());
-    if("error" in jsonResponse) {
+    if ("error" in jsonResponse) {
         console.error(jsonResponse);
-        return null
+        return null;
     }
     wakaCache.data = jsonResponse.data;
     wakaCache.lastFetched = Date.now();

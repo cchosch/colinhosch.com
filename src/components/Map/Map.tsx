@@ -52,6 +52,7 @@ const Map: FC<MapProps> = ({
 
     return <>
         <div ref={gridContainerRef} className={styles.pContainer} >
+
             <GridSvg parentRef={gridContainerRef} viewBoxWidth={svgWidth} viewBoxHeight={svgHeight} config={config} stroke="#555" opacity={0.2} strokeWidth={1} />
         </div>
 
@@ -85,14 +86,15 @@ const Map: FC<MapProps> = ({
 
                 <g ref={citiesContRef} transform={initTransformString} >
                     {includeCities && <CityPoints activeCities={activeCities} parentRef={citiesContRef} screenToSvg={screenToSvg} />}
-                    {activeCities.length === 0 && <div>
-                        Coming Soon
-                    </div>}
                 </g>
 
             </svg>
             {/*<ChinaSvg fill={landColor} stroke={landColor} strokeWidth="1" height="550px"/>*/}
-            <GlassHover />
+            {activeCities.length === 0 && <div className={styles.comingContainer}>
+                <div data-text="Coming Soon" className={`${styles.comingSoon}`}>Coming Soon</div>
+            </div>}
+
+            {false && <GlassHover />}
         </div>
 
     </>;

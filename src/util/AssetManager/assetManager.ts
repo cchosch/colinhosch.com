@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { GLTF } from "three/examples/jsm/Addons.js";
-import { getAsset, loadEnvironment, loadGLTF, loadTexture } from "./assetLoader";
+import { getAsset, loadEnvironment, loadGLTF, loadTexture } from "./assetLoader.client";
 
 // Per component defined structs
 export type AssetKind = "gltf" | "texture" | "environment";
@@ -50,17 +50,17 @@ const assetQueue: AssetDescriptor[] = [];
 export function queueAssets<T extends Record<string, AssetDescriptor>>(
     defs: T
 ) {
-    const newAssets = Object.values(defs).filter(({url}) => {
-        return assetQueue.find(({url: u2}) => u2 === url) === undefined;
+    const newAssets = Object.values(defs).filter(({ url }) => {
+        return assetQueue.find(({ url: u2 }) => u2 === url) === undefined;
     });
 
-    if(newAssets.length > 0)
+    if (newAssets.length > 0)
         assetQueue.push(...newAssets);
 }
 
 export async function loadAllAssets() {
     await Promise.all(
-        assetQueue.map((desc) => 
+        assetQueue.map((desc) =>
             loadAsset(desc)
         )
     );
@@ -72,7 +72,7 @@ export function getAssets<T extends Record<string, AssetDescriptor>>(
 ): LoadedAssets<T> {
     const entries = Object.entries(defs) as [keyof T, T[keyof T]][];
 
-    const ents =  entries.map(([key, desc]) => {
+    const ents = entries.map(([key, desc]) => {
         return [key, getAsset(desc.url)];
     });
 

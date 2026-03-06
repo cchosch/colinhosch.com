@@ -45,5 +45,5 @@ export function useOverlayMaterial(meshOptions: OverlayMaterialParams): THREE.Me
         };
 
         return mat;
-    }, []); // eslint-disable-line
+    }, []);
 }

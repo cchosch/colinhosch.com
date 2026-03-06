@@ -76,7 +76,7 @@ const useTransform = (svgRef: RefObject<SVGElement | null>, svgWidth: number, sv
         [moveEnabled],
         (ev) => {
             if (moveEnabled)
-                ev.preventDefault()
+                ev.preventDefault();
         },
         undefined,
         () => svgRef.current!.parentElement!.parentElement
@@ -91,11 +91,11 @@ const useTransform = (svgRef: RefObject<SVGElement | null>, svgWidth: number, sv
             let updateTimeout: null | any = null;
             es.push(() => {
                 if (updateTimeout)
-                    clearTimeout(updateTimeout)
+                    clearTimeout(updateTimeout);
             });
             const updateRect = () => {
                 if (updateTimeout)
-                    clearTimeout(updateTimeout)
+                    clearTimeout(updateTimeout);
 
                 if (!parentRectRef.current)
                     parentRectRef.current = parent.getBoundingClientRect();

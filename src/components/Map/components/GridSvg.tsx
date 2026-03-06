@@ -25,7 +25,7 @@ const GridSvg: FC<GridSvgProps> = ({ parentRef, config, opacity, strokeWidth, st
         if (!parent) return;
 
         const bounding = parent.getBoundingClientRect();
-        const firstChild = parent.children[0] as HTMLElement | undefined;
+        const firstChild = parent.querySelector("svg") as SVGSVGElement | null;
         if (!firstChild) return;
 
         const childBounding = firstChild.getBoundingClientRect();

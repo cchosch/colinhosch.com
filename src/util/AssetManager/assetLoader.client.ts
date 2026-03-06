@@ -3,7 +3,7 @@ import { Mutex } from "async-mutex";
 import { useEffect, useState } from "react";
 import * as THREE from "three";
 import { GLTF, GLTFLoader, RGBELoader } from "three/examples/jsm/Addons.js";
-import { AssetDescriptor, LoadedType, type AssetKind, type LoadTypes } from "./assetLoader";
+import { AssetDescriptor, LoadedType, type AssetKind, type LoadTypes } from "./assetLoader.client";
 export * from "@/util/AssetManager/assetManager";
 
 export type AssetStatus = "loading" | "error";
@@ -33,6 +33,7 @@ type Listener = (snapshot: AssetSnapshot) => void;
 
 // Internal state
 const assets: Record<string, AssetRecord> = {};
+console.log(Object.keys(assets).length);
 const loadingManager = new THREE.LoadingManager();
 const listeners = new Set<Listener>();
 
@@ -155,7 +156,7 @@ async function loadAsset<T extends AssetKind>(
 export function useSubscribeAssets(listener: Listener) {
     useEffect(() => {
         return subscribeAssets(listener);
-    }, []); // eslint-disable-line
+    }, []);
 }
 
 export async function loadEnvironment(
@@ -226,3 +227,4 @@ export function useAssetsFinished(): boolean {
     return f;
 }
 
+export * from "@/util/AssetManager/assetManager";
