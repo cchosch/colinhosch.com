@@ -198,7 +198,7 @@ const addBracketColors = (h: [string, string][]) => {
             if (isOpening === null)
                 continue;
 
-            // If it's an closing character, move color index back
+            // If it's a closing character, move color index back
             if (!isOpening) {
                 colorI -= 1;
             }

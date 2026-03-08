@@ -10,7 +10,9 @@ import { LensModel } from "./Models/Lens";
 import LaptopModel from "./Models/Laptop";
 import { bindLoadWait } from "@/util/loadingState";
 
+
 const ItemScene: FC<CanvasProps & { item: "lens" | "camera" | "computer" }> = (p) => {
+    const {className, style, item} = p;
     const ortho = false;
     const orbital = false;
 
@@ -34,11 +36,11 @@ const ItemScene: FC<CanvasProps & { item: "lens" | "camera" | "computer" }> = (p
     const finished = useAssetsFinished();
 
     if (!finished)
-        return <div style={p.style} className={p.className}></div>;
+        return <div style={style} className={className}></div>;
 
-    return <div style={p.style} className={p.className}>
-        {p.item === "computer" && <canvas ref={canvasRef} style={{ display: "none", position: "fixed", aspectRatio: "3074/1981", height: "40svh", top: "0", left: "0" }}></canvas>}
-        <Canvas  {...p} style={undefined} className={undefined} >
+    return <div data-name={convItem(item)} style={style} className={className}>
+        {item === "computer" && <canvas ref={canvasRef} style={{ display: "none", position: "fixed", aspectRatio: "3074/1981", height: "40svh", top: "0", left: "0" }}></canvas>}
+        <Canvas {...p} style={undefined} className={undefined} >
             {!ortho && <PerspectiveCamera makeDefault position={[10, 0.75, 0]} fov={23.5} />}
             {ortho && <OrthographicCamera makeDefault position={[10, 0.9, 0]} scale={0.005} />}
             {orbital && <OrbitControls />}
@@ -50,7 +52,7 @@ const ItemScene: FC<CanvasProps & { item: "lens" | "camera" | "computer" }> = (p
             <InitCam orbital={orbital} />
 
             {(() => {
-                switch (p.item) {
+                switch (item) {
                     case "lens":
                         return <LensModel />;
                     case "camera":
@@ -86,5 +88,15 @@ const InitCam = ({ orbital }: { orbital: boolean }) => {
     return <></>;
 };
 
+
+function convItem(i: "lens" | "camera" | "computer"): string {
+    if(i === "lens") {
+        return "tamron 17-70mm";
+    }
+    if(i === "camera") {
+        return "sony α6700";
+    }
+    return "MBP";
+}
 
 export default ItemScene;

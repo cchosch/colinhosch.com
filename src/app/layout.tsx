@@ -15,8 +15,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+    metadataBase: new URL('http://localhost:3000'),
     title: "cchosch",
-    description: "Colin Hoscheit",
+    description: "Track Colin on his 2026 adventure across asia",
+    openGraph: {
+        title: "cchosch",
+        description: "Track Colin on his 2026 adventure",
+        url: "https://colinhoscheit.com",
+        siteName: "Colin Hoscheit",
+        images: [
+            {
+                height: 300,
+                width: 573,
+                url: "/preview.png",
+                alt: "Colin Hoscheit"
+            }
+        ]
+    }
 };
 
 export default function RootLayout({

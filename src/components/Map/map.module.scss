@@ -1,7 +1,7 @@
 .mapContainer {
     overflow: hidden;
 
-    &>svg {
+    & > svg {
         aspect-ratio: 747.33 / 550;
         position: absolute;
         padding: 10px;
@@ -59,7 +59,7 @@
     border-radius: 20px;
     background-color: #d5e7f3;
 
-    &>svg {
+    & > svg {
         aspect-ratio: 747.33 / 550;
         position: absolute;
         top: 50%;

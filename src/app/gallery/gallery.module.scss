@@ -1,0 +1,28 @@
+
+.galleryCont {
+    font-family: 'WeirdSerif', serif;
+    font-weight: 700;
+    font-size: 5rem;
+    height: calc(100svh - 120px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 60px;
+    transition: 100ms ease font-size;
+    text-align: center;
+    padding: 0 10px;
+}
+
+
+@media (max-width: 678px) {
+    .galleryCont {
+        font-size: 3.5rem;
+    }
+}
+
+@media (max-width: 540px) {
+    .galleryCont {
+        font-size: 2.5rem;
+    }
+
+}

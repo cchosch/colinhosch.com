@@ -9,6 +9,7 @@ body:has(.loadingScreen.active) {
     margin-bottom: 16px;
     width: 50px;
 }
+
 .loadingContent {
     font-family: var(--font-mono);
     display: flex;
@@ -24,6 +25,7 @@ body:has(.loadingScreen.active) {
 
 .statusCont {
     position: relative;
+
     &::after,
     &::before {
         content: "";
@@ -34,11 +36,13 @@ body:has(.loadingScreen.active) {
         z-index: -1;
         border-radius: 1rem;
     }
+
     &::after {
         transition: 300ms ease height;
         height: var(--loading-height);
         background-color: $successColor;
     }
+
     &::before {
         height: calc(100% - 0.8rem);
         background-color: $waitingColor;
@@ -65,8 +69,10 @@ body:has(.loadingScreen.active) {
         transition: 200ms ease all;
         height: 1rem;
     }
+
     &.success > svg {
         fill: rgb(12, 236, 34);
+
         & path {
             background-color: white;
         }
@@ -108,7 +114,7 @@ body:has(.loadingScreen.active) {
     border-bottom: 2px solid transparent;
 
     & > * {
-        transition: 1s ease all;
+        transition: 1s ease opacity;
         opacity: 0;
     }
 
@@ -117,6 +123,7 @@ body:has(.loadingScreen.active) {
         border-bottom: 2px solid white;
         backdrop-filter: blur(20px);
         background-color: rgba(255, 255, 255, 1);
+
         & > * {
             opacity: 1;
         }

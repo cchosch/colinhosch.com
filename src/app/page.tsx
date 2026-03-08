@@ -5,6 +5,7 @@ import ItemScene from "./_ItemScene";
 import "@/util/AssetManager";
 import LoadingScreen from "@/components/LoadingScreen";
 
+
 // [{ name: "Beijing", "lat": 40.190632, "lon": 116.412144, tier: 1, id: "bj" }]
 export default async function Home() {
 
@@ -19,9 +20,11 @@ export default async function Home() {
                     <div className="mb-2 mt-6 font-mono text-3xl text-center w-full font-bold">Items</div>
 
                     <div className={styles.itemsContainer}>
-                        <ItemScene item="lens" className={styles.itemCanvas} />
-                        <ItemScene item="camera" className={styles.itemCanvas} />
-                        <ItemScene item="computer" className={styles.itemCanvas} />
+                        {(["lens", "camera", "computer"] as ["lens", "camera", "computer"]).map((item) => {
+                            return <div key={item} className={styles.itemCanvasContainer}>
+                                <ItemScene key={item} item={item} className={styles.itemCanvas}/>
+                            </div>;
+                        })}
                     </div>
                 </div>
                 <div >
@@ -29,7 +32,7 @@ export default async function Home() {
                 </div>
             </div>
             <div className="px-2 text-center mt-4 mb-2 flex-col flex text-lg">
-                Follow me on my great asian expedition of 2026
+                Track me on my great asian expedition of 2026
             </div>
         </div>
     </>;

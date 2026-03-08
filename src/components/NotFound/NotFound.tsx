@@ -1,9 +1,12 @@
 import Nav from "../Nav";
+import styles from "./notfound.module.scss";
 
 const NotFound = () => {
     return <>
         <Nav />
-        Oops! Not Found
+        <div className={styles.notFound}>
+            Oops! Not Found
+        </div>
     </>;
 };
 

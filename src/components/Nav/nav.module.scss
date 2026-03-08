@@ -4,5 +4,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-bottom: 10px;
+    //padding-bottom: 10px;
+}
+
+@media (max-width: 540px) {
+    .nav {
+        justify-content: flex-start;
+        padding-left: 1.5rem;
+    }
 }
